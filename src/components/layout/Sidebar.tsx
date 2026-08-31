@@ -20,7 +20,9 @@ import {
   Box,
   Truck,
   Package,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Calendar,
+  DollarSign
 } from 'lucide-react';
 import { cn } from '../../types';
 
@@ -43,8 +45,9 @@ const routeMap: Record<string, string> = {
   admin: '/admin',
   reports: '/reports',
   settings: '/settings',
-  pedidos: '/pedidos',
-  conciliaciones: '/conciliaciones',
+  alquileres: '/alquileres',
+  calendario: '/calendario',
+  liquidacion: '/liquidacion',
 };
 
 import { supabase } from '../../lib/supabaseClient';
@@ -54,36 +57,7 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const collapsed = state.sidebarCollapsed;
-  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({
-    pedidos: true,
-    ordenes: true
-  });
-  const [walletBalance, setWalletBalance] = React.useState<number | null>(null);
-
-  React.useEffect(() => {
-    if (collapsed) return;
-    const fetchBalance = async () => {
-      try {
-        const res = await fetch('/api/hoko', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            endpoint: '/member/wallet/getBalance',
-            method: 'GET',
-          }),
-        });
-        const data = await res.json();
-        // Handle variations of Hoko balance responses (e.g. data.balance, data.data?.balance, etc.)
-        const balance = data.balance ?? data.data?.balance ?? data.wallet?.balance ?? data.available_balance ?? null;
-        if (balance !== null) {
-          setWalletBalance(Number(balance));
-        }
-      } catch (e) {
-        console.error('Error fetching wallet balance', e);
-      }
-    };
-    fetchBalance();
-  }, [collapsed]);
+  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({});
 
   const groups: { title: string; items: MenuItem[] }[] = [
     {
@@ -94,52 +68,24 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
       ]
     },
     {
-      title: "Pedidos",
+      title: "Operaciones",
       items: [
-        {
-          id: 'pedidos',
-          label: 'Pedidos',
-          icon: ClipboardList,
-          path: '/pedidos'
-        },
-        {
-          id: 'pedidos-confirmar',
-          label: 'Por Confirmar',
-          icon: CheckSquare,
-          path: '/pedidos/confirmar'
-        },
+        { id: 'alquileres', label: 'Alquileres', icon: ClipboardList, path: '/alquileres' },
+        { id: 'calendario', label: 'Calendario', icon: Calendar, path: '/calendario' },
+        { id: 'tasks', label: 'Tareas', icon: CheckSquare },
       ]
     },
     {
-      title: "Ordenes",
+      title: "Finanzas",
       items: [
-        {
-          id: 'ordenes',
-          label: 'HOKO',
-          icon: Box,
-          subItems: [
-            { id: 'orders-list', label: 'Ordenes', path: '/ordenes' },
-            { id: 'orders-stocks', label: 'Stocks', path: '/ordenes/stocks' },
-            { id: 'orders-productos', label: 'Productos', path: '/ordenes/productos' },
-            { id: 'orders-guias', label: 'Guías', path: '/ordenes/guias' },
-            { id: 'orders-devoluciones', label: 'Devoluciones', path: '/ordenes/devoluciones' },
-            { id: 'orders-novedades', label: 'Novedades', path: '/ordenes/novedades' },
-          ]
-        },
+        { id: 'liquidacion', label: 'Liquidación', icon: DollarSign, path: '/liquidacion' },
       ]
     },
     {
-      title: "Ventas",
+      title: "Comercial",
       items: [
         { id: 'contacts', label: 'Clientes', icon: Users },
         { id: 'pipeline', label: 'Pipeline', icon: Trello },
-        { id: 'conciliaciones', label: 'Liquidación', icon: FileSpreadsheet, path: '/conciliaciones' },
-      ]
-    },
-    {
-      title: "Operaciones",
-      items: [
-        { id: 'tasks', label: 'Tareas', icon: CheckSquare },
       ]
     },
     {
@@ -183,15 +129,15 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
                <img 
                  src="/icono-fabrica-winners-sin-fondo.png" 
-                 alt="Telocalizo Chats Icon" 
+                 alt="Alquiler Ecografos Icon" 
                  className="w-8 h-8 object-contain"
                />
-                <h1 className="text-[13px] font-black text-white tracking-tight uppercase italic">Telocalizo<span className="text-brand-light">Chats</span></h1>
+                <h1 className="text-[11px] font-black text-white tracking-tight uppercase italic">Alquiler<span className="text-brand-light">Ecografos</span></h1>
             </div>
          ) : (
             <img 
               src="/icono-fabrica-winners-sin-fondo.png" 
-              alt="Telocalizo Chats Icon" 
+              alt="Alquiler Ecografos Icon" 
               className="w-8 h-8 object-contain mx-auto"
             />
          )}
@@ -301,19 +247,6 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
       </div>
 
       <div className="p-2 border-t border-white/10 shrink-0">
-        {!collapsed && walletBalance !== null && (
-          <div className="mb-2 bg-brand/10 p-2.5 rounded-xl border border-brand/20 flex items-center justify-between">
-            <div>
-              <span className="text-[8px] font-black text-brand uppercase tracking-widest block leading-none">Saldo Hoko</span>
-              <span className="text-xs font-bold text-white block mt-1 font-mono">
-                ${walletBalance.toLocaleString('es-CO')} COP
-              </span>
-            </div>
-            <div className="w-6 h-6 rounded-md bg-brand/20 flex items-center justify-center text-brand shrink-0">
-              <span className="text-[10px] font-black font-mono">$</span>
-            </div>
-          </div>
-        )}
         {!collapsed && (
           <div 
             onClick={() => handleNav('settings')}

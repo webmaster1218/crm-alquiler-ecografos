@@ -42,35 +42,24 @@ const allGroups = [
     ],
   },
   {
-    title: 'Pedidos',
+    title: 'Operaciones',
     items: [
-      { id: 'pedidos', label: 'Pedidos', icon: ShoppingCart, path: '/pedidos' },
-      { id: 'pedidos-confirmar', label: 'Por Confirmar', icon: CheckSquare, path: '/pedidos/confirmar' },
+      { id: 'alquileres', label: 'Alquileres', icon: ClipboardList, path: '/alquileres' },
+      { id: 'calendario', label: 'Calendario', icon: ClipboardList, path: '/calendario' }, // We'll map to calendar icon via import dynamically or use list
+      { id: 'tasks', label: 'Tareas', icon: CheckSquare, path: '/tasks' },
     ],
   },
   {
-    title: 'Ordenes',
+    title: 'Finanzas',
     items: [
-      { id: 'ordenes', label: 'Ordenes', icon: Box, path: '/ordenes' },
-      { id: 'ordenes-stocks', label: 'Stocks', icon: Package, path: '/ordenes/stocks' },
-      { id: 'ordenes-productos', label: 'Productos', icon: FileText, path: '/ordenes/productos' },
-      { id: 'ordenes-guias', label: 'Guías', icon: Truck, path: '/ordenes/guias' },
-      { id: 'ordenes-devoluciones', label: 'Devoluciones', icon: RotateCcw, path: '/ordenes/devoluciones' },
-      { id: 'ordenes-novedades', label: 'Novedades', icon: AlertCircle, path: '/ordenes/novedades' },
+      { id: 'liquidacion', label: 'Liquidación', icon: FileSpreadsheet, path: '/liquidacion' },
     ],
   },
   {
-    title: 'Ventas',
+    title: 'Comercial',
     items: [
       { id: 'contacts', label: 'Clientes', icon: Users, path: '/contacts' },
       { id: 'pipeline', label: 'Pipeline', icon: Trello, path: '/pipeline' },
-      { id: 'conciliaciones', label: 'Liquidación', icon: FileSpreadsheet, path: '/conciliaciones' },
-    ],
-  },
-  {
-    title: 'Operaciones',
-    items: [
-      { id: 'tasks', label: 'Tareas', icon: CheckSquare, path: '/tasks' },
     ],
   },
   {
@@ -87,8 +76,8 @@ const allGroups = [
 const pinnedItems = [
   { id: 'dashboard', label: 'Inicio', icon: LayoutDashboard, path: '/dashboard' },
   { id: 'chat', label: 'Mensajes', icon: MessageCircle, path: '/chat', badge: 3 },
-  { id: 'pedidos', label: 'Pedidos', icon: ClipboardList, path: '/pedidos' },
-  { id: 'ordenes', label: 'Ordenes', icon: Box, path: '/ordenes' },
+  { id: 'alquileres', label: 'Alquileres', icon: ClipboardList, path: '/alquileres' },
+  { id: 'contacts', label: 'Clientes', icon: Users, path: '/contacts' },
 ];
 
 export function MobileNav({ activeTab }: MobileNavProps) {
@@ -105,13 +94,11 @@ export function MobileNav({ activeTab }: MobileNavProps) {
   };
 
   const isActive = (itemId: string) => {
-    if (itemId === 'pedidos') {
-      // Active when on /pedidos or any /pedidos/... subroute
-      return activeTab === 'pedidos';
+    if (itemId === 'alquileres') {
+      return activeTab === 'alquileres';
     }
-    if (itemId === 'ordenes') {
-      // Active when on /ordenes or any /ordenes/... subroute
-      return activeTab === 'ordenes';
+    if (itemId === 'contacts') {
+      return activeTab === 'contacts';
     }
     return activeTab === itemId;
   };
@@ -150,11 +137,11 @@ export function MobileNav({ activeTab }: MobileNavProps) {
                 <div className="flex items-center gap-2">
                   <img
                     src="/icono-fabrica-winners-sin-fondo.png"
-                    alt="Winners Hub"
+                    alt="Alquiler Ecografos"
                     className="w-6 h-6 object-contain"
                   />
                   <span className="text-sm font-black text-text-primary uppercase tracking-tight italic">
-                    Winners<span className="text-blue-400">Hub</span>
+                    Alquiler<span className="text-blue-400">Ecografos</span>
                   </span>
                 </div>
                 <button
