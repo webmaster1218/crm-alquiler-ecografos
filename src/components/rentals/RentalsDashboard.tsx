@@ -174,11 +174,11 @@ export function RentalsDashboard() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight uppercase italic flex items-center gap-2">
+          <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase italic flex items-center gap-2">
             <ClipboardList className="text-brand shrink-0" size={24} />
             Alquileres
           </h1>
-          <p className="text-sm text-white/50">Control de reservas, bloqueos y logística de ecógrafos.</p>
+          <p className="text-sm text-text-secondary">Control de reservas, bloqueos y logística de ecógrafos.</p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button 
@@ -194,7 +194,7 @@ export function RentalsDashboard() {
           <ExportDropdown onExportCSV={() => handleExport('csv')} onExportXML={() => handleExport('xml')} />
           <button 
             onClick={fetchBookings} 
-            className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white transition-colors"
+            className="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -203,59 +203,59 @@ export function RentalsDashboard() {
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
             <Truck size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Activos en Clínica</span>
-            <span className="text-2xl font-black text-white block mt-0.5">{stats.activeRentals}</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Activos en Clínica</span>
+            <span className="text-2xl font-black text-text-primary block mt-0.5">{stats.activeRentals}</span>
           </div>
         </div>
 
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
             <DollarSign size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Ingreso Activo (MRR)</span>
-            <span className="text-2xl font-black text-white block mt-0.5">${stats.mrr.toLocaleString('es-CO')}</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Ingreso Activo (MRR)</span>
+            <span className="text-2xl font-black text-text-primary block mt-0.5">${stats.mrr.toLocaleString('es-CO')}</span>
           </div>
         </div>
 
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
             <TrendingUp size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Tasa de Ocupación</span>
-            <span className="text-2xl font-black text-white block mt-0.5">{stats.occupancyRate}%</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Tasa de Ocupación</span>
+            <span className="text-2xl font-black text-text-primary block mt-0.5">{stats.occupancyRate}%</span>
           </div>
         </div>
 
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
             <AlertTriangle size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Mantenimientos</span>
-            <span className="text-2xl font-black text-white block mt-0.5">{stats.maintenanceCount}</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Mantenimientos</span>
+            <span className="text-2xl font-black text-text-primary block mt-0.5">{stats.maintenanceCount}</span>
           </div>
         </div>
       </div>
 
       {/* Filter and Table Card */}
-      <div className="bg-card border border-white/10 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-card border border-slate-200/60 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         {/* Search & Filters */}
-        <div className="p-4 border-b border-white/10 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+        <div className="p-4 border-b border-slate-200/60 dark:border-slate-800 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
           <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-placeholder" size={16} />
             <input 
               type="text" 
               placeholder="Buscar por médico, NIT, email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-brand transition-colors"
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-100/50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary placeholder:text-text-placeholder text-sm focus:outline-none focus:border-brand transition-colors"
             />
           </div>
 
@@ -263,10 +263,10 @@ export function RentalsDashboard() {
             <button 
               onClick={() => setShowFilters(!showFilters)} 
               className={cn(
-                "p-2.5 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all",
+                "p-2.5 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all cursor-pointer",
                 showFilters 
                   ? "bg-brand/10 border-brand text-brand" 
-                  : "bg-white/5 border-white/10 text-white/70 hover:text-white"
+                  : "bg-slate-100/80 dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 text-text-secondary hover:text-text-primary"
               )}
             >
               <Filter size={14} /> Filtros
@@ -274,24 +274,24 @@ export function RentalsDashboard() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold focus:outline-none cursor-pointer"
+              className="px-3 py-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-xs font-bold focus:outline-none cursor-pointer"
             >
-              <option value="ALL" className="bg-slate-800 text-white">Todos los Estados</option>
-              <option value="pending_confirmation" className="bg-slate-800 text-white">En Reposo</option>
-              <option value="pending_delivery" className="bg-slate-800 text-white">Pendiente Entrega</option>
-              <option value="delivered" className="bg-slate-800 text-white">Entregado</option>
-              <option value="pending_pickup" className="bg-slate-800 text-white">Pendiente Recogida</option>
-              <option value="completed" className="bg-slate-800 text-white">Completado</option>
-              <option value="maintenance" className="bg-slate-800 text-white">Mantenimiento</option>
-              <option value="cancelled" className="bg-slate-800 text-white">Cancelado</option>
+              <option value="ALL" className="bg-card text-text-primary">Todos los Estados</option>
+              <option value="pending_confirmation" className="bg-card text-text-primary">En Reposo</option>
+              <option value="pending_delivery" className="bg-card text-text-primary">Pendiente Entrega</option>
+              <option value="delivered" className="bg-card text-text-primary">Entregado</option>
+              <option value="pending_pickup" className="bg-card text-text-primary">Pendiente Recogida</option>
+              <option value="completed" className="bg-card text-text-primary">Completado</option>
+              <option value="maintenance" className="bg-card text-text-primary">Mantenimiento</option>
+              <option value="cancelled" className="bg-card text-text-primary">Cancelado</option>
             </select>
           </div>
         </div>
 
         {/* Filter Details panel */}
         {showFilters && (
-          <div className="bg-white/5 p-4 border-b border-white/10 flex flex-wrap gap-2 animate-in fade-in duration-200">
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest flex items-center mr-2">Filtros Activos:</span>
+          <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border-b border-slate-200/60 dark:border-slate-800 flex flex-wrap gap-2 animate-in fade-in duration-200">
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-widest flex items-center mr-2">Filtros Activos:</span>
             {statusFilter !== 'ALL' && (
               <span className="bg-brand/10 text-brand text-xs px-2.5 py-1 rounded-lg border border-brand/20 flex items-center gap-1.5 font-semibold">
                 Estado: {statusFilter}
@@ -312,18 +312,18 @@ export function RentalsDashboard() {
           {loading ? (
             <div className="p-12 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
-              <p className="text-xs text-white/40 mt-4">Consultando base de datos de alquileres...</p>
+              <p className="text-xs text-text-muted mt-4">Consultando base de datos de alquileres...</p>
             </div>
           ) : filteredBookings.length === 0 ? (
             <div className="p-12 text-center space-y-2">
-              <ClipboardList className="text-white/20 mx-auto" size={40} />
-              <p className="text-sm font-bold text-white/70">No se encontraron alquileres</p>
-              <p className="text-xs text-white/40">Prueba ajustando los filtros o realiza una reserva manual.</p>
+              <ClipboardList className="text-text-placeholder mx-auto" size={40} />
+              <p className="text-sm font-bold text-text-secondary">No se encontraron alquileres</p>
+              <p className="text-xs text-text-muted">Prueba ajustando los filtros o realiza una reserva manual.</p>
             </div>
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-white/5 border-b border-white/10 text-white/40 text-[10px] font-black uppercase tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-950/20 border-b border-slate-200/60 dark:border-slate-800 text-text-muted text-[10px] font-black uppercase tracking-wider">
                   <th className="px-6 py-4">Cliente</th>
                   <th className="px-6 py-4">Fechas</th>
                   <th className="px-6 py-4">Equipos Contratados</th>
@@ -332,7 +332,7 @@ export function RentalsDashboard() {
                   <th className="px-6 py-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40 text-sm">
                 {filteredBookings.map((booking) => (
                   <tr 
                     key={booking.id} 
@@ -340,23 +340,23 @@ export function RentalsDashboard() {
                       setSelectedBooking(booking);
                       setShowBookingModal(true);
                     }}
-                    className="hover:bg-white/5 transition-colors cursor-pointer group"
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition-colors cursor-pointer group"
                   >
                     <td className="px-6 py-4">
-                      <div className="font-bold text-white">{booking.client_name}</div>
-                      <div className="text-[10px] text-white/50">{booking.client_email || 'Sin correo'}</div>
+                      <div className="font-bold text-text-primary">{booking.client_name}</div>
+                      <div className="text-[10px] text-text-secondary">{booking.client_email || 'Sin correo'}</div>
                       <div className="text-[10px] font-semibold text-brand mt-0.5">{booking.document_number}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-white font-semibold">{booking.start_date}</div>
-                      <div className="text-xs text-white/40">al {booking.end_date}</div>
+                      <div className="text-text-primary font-semibold">{booking.start_date}</div>
+                      <div className="text-xs text-text-muted">al {booking.end_date}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-white max-w-[280px] truncate">{getEquipmentSummary(booking)}</div>
-                      <div className="text-[10px] text-white/50 mt-0.5">Dir: {booking.client_address}</div>
+                      <div className="text-text-primary max-w-[280px] truncate">{getEquipmentSummary(booking)}</div>
+                      <div className="text-[10px] text-text-secondary mt-0.5">Dir: {booking.client_address}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-mono font-bold text-white">
+                      <span className="font-mono font-bold text-text-primary">
                         ${(Number(booking.total_price) || 0).toLocaleString('es-CO')}
                       </span>
                     </td>
@@ -370,7 +370,7 @@ export function RentalsDashboard() {
                             setSelectedBooking(booking);
                             setShowBookingModal(true);
                           }}
-                          className="p-1.5 rounded-lg bg-white/5 hover:bg-brand/20 hover:text-brand text-white/70 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100/50 dark:bg-slate-950 hover:bg-brand/20 hover:text-brand text-text-secondary transition-colors cursor-pointer"
                           title="Editar"
                         >
                           <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />

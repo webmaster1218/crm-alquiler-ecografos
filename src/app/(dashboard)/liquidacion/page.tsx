@@ -86,15 +86,15 @@ export default function LiquidacionPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight uppercase italic flex items-center gap-2">
+          <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase italic flex items-center gap-2">
             <DollarSign className="text-brand shrink-0" size={24} />
             Liquidación Financiera
           </h1>
-          <p className="text-sm text-white/50">Conciliación de depósitos, saldos de alquileres y comprobantes de abonos.</p>
+          <p className="text-sm text-text-secondary">Conciliación de depósitos, saldos de alquileres y comprobantes de abonos.</p>
         </div>
         <button 
           onClick={handleExport}
-          className="px-4 py-2 bg-brand text-white font-black hover:bg-brand/80 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2"
+          className="px-4 py-2 bg-brand text-white font-black hover:bg-brand/80 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
         >
           <FileSpreadsheet size={14} /> Exportar Conciliación
         </button>
@@ -102,42 +102,42 @@ export default function LiquidacionPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
             <ArrowUpRight size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Total Facturado</span>
-            <span className="text-xl font-black text-white block mt-0.5">${stats.totalBilled.toLocaleString('es-CO')}</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Total Facturado</span>
+            <span className="text-xl font-black text-text-primary block mt-0.5">${stats.totalBilled.toLocaleString('es-CO')}</span>
           </div>
         </div>
 
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
             <TrendingUp size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Total Recaudado</span>
-            <span className="text-xl font-black text-white block mt-0.5">${stats.collected.toLocaleString('es-CO')}</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Total Recaudado</span>
+            <span className="text-xl font-black text-text-primary block mt-0.5">${stats.collected.toLocaleString('es-CO')}</span>
           </div>
         </div>
 
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center shrink-0">
             <AlertTriangle size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Cuentas por Cobrar</span>
-            <span className="text-xl font-black text-white block mt-0.5">${stats.outstanding.toLocaleString('es-CO')}</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Cuentas por Cobrar</span>
+            <span className="text-xl font-black text-text-primary block mt-0.5">${stats.outstanding.toLocaleString('es-CO')}</span>
           </div>
         </div>
 
-        <div className="bg-card border border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
             <CheckCircle size={22} />
           </div>
           <div>
-            <span className="text-[10px] font-black text-white/40 uppercase tracking-wider block">Fondos de Garantía</span>
+            <span className="text-[10px] font-black text-text-muted uppercase tracking-wider block">Fondos de Garantía</span>
             <span className="text-xl font-black text-white block mt-0.5">${stats.depositGuarantees.toLocaleString('es-CO')}</span>
           </div>
         </div>

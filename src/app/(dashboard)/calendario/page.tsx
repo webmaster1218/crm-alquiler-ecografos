@@ -72,22 +72,22 @@ export default function CalendarioPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight uppercase italic flex items-center gap-2">
+          <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase italic flex items-center gap-2">
             <CalendarIcon className="text-brand shrink-0" size={24} />
             Calendario Logístico
           </h1>
-          <p className="text-sm text-white/50">Planificación de despachos, recogidas y mantenimientos de ecógrafos.</p>
+          <p className="text-sm text-text-secondary">Planificación de despachos, recogidas y mantenimientos de ecógrafos.</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={handleExport}
-            className="px-4 py-2 bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-xl text-xs font-bold transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary hover:bg-slate-200 dark:hover:bg-slate-900 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
           >
             <FileSpreadsheet size={14} /> Exportar Reporte
           </button>
           <button 
             onClick={() => setRefreshKey(prev => prev + 1)}
-            className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:text-white transition-colors"
+            className="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
           >
             <RefreshCw size={14} />
           </button>
@@ -95,7 +95,7 @@ export default function CalendarioPage() {
       </div>
 
       {/* Calendar Card */}
-      <div className="bg-card border border-white/10 p-4 rounded-2xl shadow-sm">
+      <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
         <BookingsCalendar 
           key={refreshKey}
           onEditBooking={handleEditBooking}

@@ -65,7 +65,7 @@ export async function checkAvailability(startDate?: string, endDate?: string, ex
         // Query bookings that overlap with the requested range
         let query = supabase
             .from('bookings')
-            .select('quantity_z6, quantity_z60, quantity_m7, quantity_mx3')
+            .select('quantity_z6, quantity_z60, quantity_m7')
             .filter('status', 'not.in', '(cancelled,completed)')
             .lte('start_date', endDate)
             .gte('end_date', startDate);
@@ -80,39 +80,21 @@ export async function checkAvailability(startDate?: string, endDate?: string, ex
         if (error) {
             console.error('Error checking availability:', error?.message, error?.code, error?.details);
             
-            // Fallback queries for older tables without mx3/m7
-            if (error?.message?.includes('quantity_mx3') || error?.message?.includes('quantity_m7') || error?.code === '42703') {
-                try {
-                    const { data: bookingsFallback, error: errorFallback } = await supabase
-                        .from('bookings')
-                        .select('quantity_z6, quantity_z60, quantity_m7')
-                        .filter('status', 'not.in', '(cancelled,completed)')
-                        .lte('start_date', endDate)
-                        .gte('end_date', startDate);
-                    
-                    if (!errorFallback && bookingsFallback) {
-                        let blockedZ6 = 0, blockedZ60 = 0, blockedM7 = 0;
-                        bookingsFallback.forEach(b => {
-                            blockedZ6 += (b.quantity_z6 || 0);
-                            blockedZ60 += (b.quantity_z60 || 0);
-                            blockedM7 += (b.quantity_m7 || 0);
-                        });
-                        const av6 = Math.max(0, totalStock.z6 - blockedZ6);
-                        const av60 = Math.max(0, totalStock.z60 - blockedZ60);
-                        const avM7 = Math.max(0, totalStock.m7 - blockedM7);
-                        return { z6: av6, z60: av60, m7: avM7, mx3: totalStock.mx3, available: av6 > 0 || av60 > 0 || avM7 > 0 };
-                    }
-                } catch (innerErr) {
-                    console.warn("Failed querying quantity_m7 too", innerErr);
-                }
-
+            // Fallback queries for older tables without m7
+            if (error?.message?.includes('quantity_m7') || error?.code === '42703') {
                 // Hard fallback: just z6 and z60
-                const { data: bookingsFallback2, error: errorFallback2 } = await supabase
+                let queryFallback = supabase
                     .from('bookings')
                     .select('quantity_z6, quantity_z60')
                     .filter('status', 'not.in', '(cancelled,completed)')
                     .lte('start_date', endDate)
                     .gte('end_date', startDate);
+
+                if (excludeId) {
+                    queryFallback = queryFallback.neq('id', excludeId);
+                }
+
+                const { data: bookingsFallback2, error: errorFallback2 } = await queryFallback;
 
                 if (errorFallback2) throw errorFallback2;
 
@@ -139,7 +121,7 @@ export async function checkAvailability(startDate?: string, endDate?: string, ex
                 blockedZ6 += (booking.quantity_z6 || 0);
                 blockedZ60 += (booking.quantity_z60 || 0);
                 blockedM7 += (booking.quantity_m7 || 0);
-                blockedMx3 += (booking.quantity_mx3 || 0);
+                // quantity_mx3 is not in database, so it's always 0
             });
         }
 

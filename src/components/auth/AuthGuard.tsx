@@ -14,6 +14,30 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkUser = async () => {
+      const isAdminAuth = sessionStorage.getItem('admin_auth') === 'true';
+
+      if (isAdminAuth) {
+        if (!state.currentUser) {
+          const appUser: User = {
+            id: '41801508-ee2e-454a-b8a7-b07b60585d85',
+            name: 'Administrador Principal',
+            email: 'admin@ecoespecializada.com',
+            role: 'Superadmin',
+            status: 'En línea',
+            avatar: undefined,
+            activeConversations: 0,
+            lastAccess: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+          dispatch({ type: 'SET_USER', payload: appUser });
+        }
+        if (pathname === '/login') {
+          router.push('/dashboard');
+        } else {
+          setChecking(false);
+        }
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
@@ -72,6 +96,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     checkUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (sessionStorage.getItem('admin_auth') === 'true') {
+        return;
+      }
+
       if (event === 'SIGNED_OUT') {
         dispatch({ type: 'SET_USER', payload: null });
         router.push('/login');

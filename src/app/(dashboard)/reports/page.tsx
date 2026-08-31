@@ -81,11 +81,11 @@ export default function ReportsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-white tracking-tight uppercase italic flex items-center gap-2">
+        <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase italic flex items-center gap-2">
           <BarChart3 className="text-brand shrink-0" size={24} />
           Reportes y Estadísticas
         </h1>
-        <p className="text-sm text-white/50">Métricas clave de rendimiento, rentabilidad y ocupación histórica.</p>
+        <p className="text-sm text-text-secondary">Métricas clave de rendimiento, rentabilidad y ocupación histórica.</p>
       </div>
 
       {loading ? (
@@ -95,19 +95,19 @@ export default function ReportsPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Revenue chart */}
-          <div className="lg:col-span-2 bg-card border border-white/10 p-5 rounded-2xl space-y-4">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <div className="lg:col-span-2 bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl space-y-4">
+            <h3 className="text-xs font-black text-text-primary uppercase tracking-wider flex items-center gap-2">
               <Activity className="text-brand" size={14} /> Historial de Ingresos Mensuales
             </h3>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.4)" fontSize={10} />
-                  <YAxis stroke="rgba(255,255,255,0.4)" fontSize={10} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-[0.05]" />
+                  <XAxis dataKey="month" stroke="currentColor" className="opacity-50" fontSize={10} />
+                  <YAxis stroke="currentColor" className="opacity-50" fontSize={10} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                    labelStyle={{ color: 'white' }}
+                    contentStyle={{ backgroundColor: 'var(--color-bg-card, #1e293b)', border: '1px solid var(--color-border, rgba(255,255,255,0.1))', borderRadius: '8px' }}
+                    labelStyle={{ color: 'var(--color-text-primary, white)' }}
                   />
                   <Bar dataKey="Ingresos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -116,8 +116,8 @@ export default function ReportsPage() {
           </div>
 
           {/* Model Rentability Share */}
-          <div className="bg-card border border-white/10 p-5 rounded-2xl space-y-4">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-5 rounded-2xl space-y-4">
+            <h3 className="text-xs font-black text-text-primary uppercase tracking-wider flex items-center gap-2">
               <PieIcon className="text-emerald-400" size={14} /> Rentabilidad por Modelo
             </h3>
             <div className="h-[220px] w-full relative flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function ReportsPage() {
                   </Pie>
                   <Tooltip 
                     formatter={(value) => `$${Number(value).toLocaleString('es-CO')}`}
-                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: 'var(--color-bg-card, #1e293b)', border: '1px solid var(--color-border, rgba(255,255,255,0.1))', borderRadius: '8px' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -146,9 +146,9 @@ export default function ReportsPage() {
             
             <div className="grid grid-cols-2 gap-2 pt-2">
               {modelShares.map((m, idx) => (
-                <div key={m.name} className="flex items-center gap-2 text-[10px] font-bold text-white/70">
+                <div key={m.name} className="flex items-center gap-2 text-[10px] font-bold text-text-secondary">
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[idx % COLORS.length] }}></div>
-                  <span className="truncate">{m.name}: <span className="font-mono text-white">${m.value.toLocaleString('es-CO')}</span></span>
+                  <span className="truncate">{m.name}: <span className="font-mono text-text-primary">${m.value.toLocaleString('es-CO')}</span></span>
                 </div>
               ))}
             </div>

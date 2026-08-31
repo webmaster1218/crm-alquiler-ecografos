@@ -401,43 +401,43 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-card border border-white/10 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="bg-card border border-slate-200/60 dark:border-slate-800 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
-          <div className="flex items-center gap-2 text-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/60 dark:border-slate-800 shrink-0">
+          <div className="flex items-center gap-2 text-text-primary">
             <ClipboardList className="text-brand" size={20} />
             <h3 className="font-black uppercase tracking-tight italic">
               {bookingToEdit ? 'Editar Alquiler' : 'Nueva Reserva de Ecógrafo'}
             </h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5 text-white/50 hover:text-white transition-colors">
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 text-text-muted hover:text-text-primary transition-colors cursor-pointer">
             <X size={20} />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-white/10 px-6 shrink-0 bg-white/5">
+        <div className="flex border-b border-slate-200/60 dark:border-slate-800 px-6 shrink-0 bg-slate-50 dark:bg-slate-950/40">
           <button 
             onClick={() => setActiveTab('info')} 
-            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${activeTab === 'info' ? 'border-brand text-brand' : 'border-transparent text-white/50 hover:text-white'}`}
+            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeTab === 'info' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-primary'}`}
           >
             Información
           </button>
           <button 
             onClick={() => setActiveTab('financial')} 
-            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${activeTab === 'financial' ? 'border-brand text-brand' : 'border-transparent text-white/50 hover:text-white'}`}
+            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeTab === 'financial' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-primary'}`}
           >
             Desglose de Costos
           </button>
           <button 
             onClick={() => setActiveTab('documents')} 
-            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${activeTab === 'documents' ? 'border-brand text-brand' : 'border-transparent text-white/50 hover:text-white'}`}
+            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeTab === 'documents' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-primary'}`}
           >
             Contratos y Pagos
           </button>
           <button 
             onClick={() => setActiveTab('notes')} 
-            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${activeTab === 'notes' ? 'border-brand text-brand' : 'border-transparent text-white/50 hover:text-white'}`}
+            className={`py-3 px-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeTab === 'notes' ? 'border-brand text-brand' : 'border-transparent text-text-muted hover:text-text-primary'}`}
           >
             Bitácora ({comments.length})
           </button>
@@ -450,19 +450,19 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
             <div className="space-y-4">
               {/* Status */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Estado del Alquiler</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Estado del Alquiler</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData(p => ({ ...p, status: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand cursor-pointer"
                 >
-                  <option value="pending_confirmation" className="bg-slate-800">En Reposo (Pte. Confirmar)</option>
-                  <option value="pending_delivery" className="bg-slate-800">Confirmado - Pendiente de Entrega</option>
-                  <option value="delivered" className="bg-slate-800">Entregado en Clínica (Activo)</option>
-                  <option value="pending_pickup" className="bg-slate-800">Pendiente de Recogida</option>
-                  <option value="completed" className="bg-slate-800">Completado</option>
-                  <option value="maintenance" className="bg-slate-800">Mantenimiento / Bloqueo de Stock</option>
-                  <option value="cancelled" className="bg-slate-800">Cancelado</option>
+                  <option value="pending_confirmation" className="bg-card text-text-primary">En Reposo (Pte. Confirmar)</option>
+                  <option value="pending_delivery" className="bg-card text-text-primary">Confirmado - Pendiente de Entrega</option>
+                  <option value="delivered" className="bg-card text-text-primary">Entregado en Clínica (Activo)</option>
+                  <option value="pending_pickup" className="bg-card text-text-primary">Pendiente de Recogida</option>
+                  <option value="completed" className="bg-card text-text-primary">Completado</option>
+                  <option value="maintenance" className="bg-card text-text-primary">Mantenimiento / Bloqueo de Stock</option>
+                  <option value="cancelled" className="bg-card text-text-primary">Cancelado</option>
                 </select>
               </div>
 
@@ -471,22 +471,22 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                   {/* Client Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Nombre del Cliente</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Nombre del Cliente</label>
                       <input 
                         type="text" 
                         value={formData.clientName}
                         onChange={(e) => setFormData(p => ({ ...p, clientName: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                         placeholder="Dr. o Clínica"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Teléfono</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Teléfono</label>
                       <input 
                         type="text" 
                         value={formData.clientPhone}
                         onChange={(e) => setFormData(p => ({ ...p, clientPhone: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                         placeholder="Celular"
                       />
                     </div>
@@ -494,34 +494,34 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Cédula / NIT</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Cédula / NIT</label>
                       <input 
                         type="text" 
                         value={formData.documentNumber}
                         onChange={(e) => setFormData(p => ({ ...p, documentNumber: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                         placeholder="CC o NIT"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">RUT / Identificación Fiscal</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">RUT / Identificación Fiscal</label>
                       <input 
                         type="text" 
                         value={formData.taxId}
                         onChange={(e) => setFormData(p => ({ ...p, taxId: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                        className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                         placeholder="RUT del arrendatario"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Dirección de Entrega</label>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Dirección de Entrega</label>
                     <input 
                       type="text" 
                       value={formData.clientAddress}
                       onChange={(e) => setFormData(p => ({ ...p, clientAddress: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                       placeholder="Dirección completa y ciudad"
                     />
                   </div>
@@ -531,74 +531,74 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
               {/* Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Fecha de Inicio</label>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Fecha de Inicio</label>
                   <input 
                     type="date" 
                     value={formData.startDate}
                     onChange={(e) => setFormData(p => ({ ...p, startDate: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Fecha de Fin</label>
+                  <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Fecha de Fin</label>
                   <input 
                     type="date" 
                     value={formData.endDate}
                     onChange={(e) => setFormData(p => ({ ...p, endDate: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                   />
                 </div>
               </div>
 
               {/* Ecógrafos a Alquilar */}
-              <div className="border border-white/10 p-4 rounded-xl space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">Cantidades de Equipos</span>
+              <div className="border border-slate-200/60 dark:border-slate-800 p-4 rounded-xl space-y-3">
+                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted block">Cantidades de Equipos</span>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between bg-white/5 p-2.5 rounded-lg border border-white/5">
-                    <span className="text-xs font-bold text-white">MINDRAY Z6</span>
+                  <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800/40">
+                    <span className="text-xs font-bold text-text-primary">MINDRAY Z6</span>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setFormData(p => ({ ...p, quantityZ6: Math.max(0, p.quantityZ6 - 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Minus size={12} /></button>
-                      <span className="font-mono font-bold text-white text-xs">{formData.quantityZ6}</span>
-                      <button onClick={() => setFormData(p => ({ ...p, quantityZ6: Math.min(availableStock.z6, p.quantityZ6 + 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Plus size={12} /></button>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityZ6: Math.max(0, p.quantityZ6 - 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Minus size={12} /></button>
+                      <span className="font-mono font-bold text-text-primary text-xs">{formData.quantityZ6}</span>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityZ6: Math.min(availableStock.z6, p.quantityZ6 + 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Plus size={12} /></button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between bg-white/5 p-2.5 rounded-lg border border-white/5">
-                    <span className="text-xs font-bold text-white">MINDRAY Z60</span>
+                  <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800/40">
+                    <span className="text-xs font-bold text-text-primary">MINDRAY Z60</span>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setFormData(p => ({ ...p, quantityZ60: Math.max(0, p.quantityZ60 - 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Minus size={12} /></button>
-                      <span className="font-mono font-bold text-white text-xs">{formData.quantityZ60}</span>
-                      <button onClick={() => setFormData(p => ({ ...p, quantityZ60: Math.min(availableStock.z60, p.quantityZ60 + 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Plus size={12} /></button>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityZ60: Math.max(0, p.quantityZ60 - 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Minus size={12} /></button>
+                      <span className="font-mono font-bold text-text-primary text-xs">{formData.quantityZ60}</span>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityZ60: Math.min(availableStock.z60, p.quantityZ60 + 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Plus size={12} /></button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between bg-white/5 p-2.5 rounded-lg border border-white/5">
-                    <span className="text-xs font-bold text-white">MINDRAY M7</span>
+                  <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800/40">
+                    <span className="text-xs font-bold text-text-primary">MINDRAY M7</span>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setFormData(p => ({ ...p, quantityM7: Math.max(0, p.quantityM7 - 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Minus size={12} /></button>
-                      <span className="font-mono font-bold text-white text-xs">{formData.quantityM7}</span>
-                      <button onClick={() => setFormData(p => ({ ...p, quantityM7: Math.min(availableStock.m7, p.quantityM7 + 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Plus size={12} /></button>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityM7: Math.max(0, p.quantityM7 - 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Minus size={12} /></button>
+                      <span className="font-mono font-bold text-text-primary text-xs">{formData.quantityM7}</span>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityM7: Math.min(availableStock.m7, p.quantityM7 + 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Plus size={12} /></button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between bg-white/5 p-2.5 rounded-lg border border-white/5">
-                    <span className="text-xs font-bold text-white">MINDRAY MX3</span>
+                  <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800/40">
+                    <span className="text-xs font-bold text-text-primary">MINDRAY MX3</span>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setFormData(p => ({ ...p, quantityMx3: Math.max(0, p.quantityMx3 - 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Minus size={12} /></button>
-                      <span className="font-mono font-bold text-white text-xs">{formData.quantityMx3}</span>
-                      <button onClick={() => setFormData(p => ({ ...p, quantityMx3: Math.min(availableStock.mx3, p.quantityMx3 + 1) }))} className="p-1 rounded bg-white/10 hover:bg-white/20 text-white"><Plus size={12} /></button>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityMx3: Math.max(0, p.quantityMx3 - 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Minus size={12} /></button>
+                      <span className="font-mono font-bold text-text-primary text-xs">{formData.quantityMx3}</span>
+                      <button onClick={() => setFormData(p => ({ ...p, quantityMx3: Math.min(availableStock.mx3, p.quantityMx3 + 1) }))} className="p-1 rounded bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800 text-text-primary cursor-pointer"><Plus size={12} /></button>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Transductores */}
-              <div className="border border-white/10 p-4 rounded-xl space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">Transductores Extra Requeridos</span>
+              <div className="border border-slate-200/60 dark:border-slate-800 p-4 rounded-xl space-y-3">
+                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted block">Transductores Extra Requeridos</span>
                 <div className="flex flex-wrap gap-2">
                   {['Convexo', 'Endocavitario', 'Lineal'].map(trans => (
                     <button
                       key={trans}
                       type="button"
                       onClick={() => toggleTransducer(trans)}
-                      className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${formData.selectedTransducers.includes(trans) ? 'bg-brand/10 border-brand text-brand' : 'bg-white/5 border-white/10 text-white/50'}`}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${formData.selectedTransducers.includes(trans) ? 'bg-brand/10 border-brand text-brand' : 'bg-slate-50 dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 text-text-secondary hover:text-text-primary'}`}
                     >
                       {trans}
                     </button>
@@ -608,12 +608,12 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
 
               {/* Serial numbers */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-wider text-white/40 block mb-1.5">Números de Serie Despachados</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-text-muted block mb-1.5">Números de Serie Despachados</label>
                 <input 
                   type="text" 
                   value={formData.serialNumbers}
                   onChange={(e) => setFormData(p => ({ ...p, serialNumbers: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand" 
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand" 
                   placeholder="Ej: Ecógrafo S/N: Z60-123, Convexo S/N: C-991"
                 />
               </div>
@@ -622,57 +622,57 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
 
           {activeTab === 'financial' && (
             <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">Desglose de Costos de Reserva</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-text-muted block">Desglose de Costos de Reserva</span>
               
-              <div className="border border-white/10 rounded-xl overflow-hidden divide-y divide-white/5">
+              <div className="border border-slate-200/60 dark:border-slate-800 rounded-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-800/40">
                 {formData.quantityZ6 > 0 && (
-                  <div className="p-4 flex justify-between bg-white/5">
-                    <span className="text-white font-semibold">Alquiler Ecógrafo Z6 (x{formData.quantityZ6})</span>
-                    <span className="font-mono text-white">${(formData.quantityZ6 * 350000 * getDays()).toLocaleString('es-CO')}</span>
+                  <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20">
+                    <span className="text-text-primary font-semibold">Alquiler Ecógrafo Z6 (x{formData.quantityZ6})</span>
+                    <span className="font-mono text-text-primary">${(formData.quantityZ6 * 350000 * getDays()).toLocaleString('es-CO')}</span>
                   </div>
                 )}
                 {formData.quantityZ60 > 0 && (
-                  <div className="p-4 flex justify-between bg-white/5">
-                    <span className="text-white font-semibold">Alquiler Ecógrafo Z60 (x{formData.quantityZ60})</span>
-                    <span className="font-mono text-white">${(formData.quantityZ60 * 550000 * getDays()).toLocaleString('es-CO')}</span>
+                  <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20">
+                    <span className="text-text-primary font-semibold">Alquiler Ecógrafo Z60 (x{formData.quantityZ60})</span>
+                    <span className="font-mono text-text-primary">${(formData.quantityZ60 * 550000 * getDays()).toLocaleString('es-CO')}</span>
                   </div>
                 )}
                 {formData.quantityM7 > 0 && (
-                  <div className="p-4 flex justify-between bg-white/5">
-                    <span className="text-white font-semibold">Alquiler Ecógrafo M7 (x{formData.quantityM7})</span>
-                    <span className="font-mono text-white">${(formData.quantityM7 * 650000 * getDays()).toLocaleString('es-CO')}</span>
+                  <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20">
+                    <span className="text-text-primary font-semibold">Alquiler Ecógrafo M7 (x{formData.quantityM7})</span>
+                    <span className="font-mono text-text-primary">${(formData.quantityM7 * 650000 * getDays()).toLocaleString('es-CO')}</span>
                   </div>
                 )}
                 {formData.quantityMx3 > 0 && (
-                  <div className="p-4 flex justify-between bg-white/5">
-                    <span className="text-white font-semibold">Alquiler Ecógrafo MX3 (x{formData.quantityMx3})</span>
-                    <span className="font-mono text-white">${(formData.quantityMx3 * 600000 * getDays()).toLocaleString('es-CO')}</span>
+                  <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20">
+                    <span className="text-text-primary font-semibold">Alquiler Ecógrafo MX3 (x{formData.quantityMx3})</span>
+                    <span className="font-mono text-text-primary">${(formData.quantityMx3 * 600000 * getDays()).toLocaleString('es-CO')}</span>
                   </div>
                 )}
                 
                 {/* Accessories */}
-                <div className="p-4 flex justify-between bg-white/5 items-center">
-                  <span className="text-white font-semibold">Incluir Carrito (Opcional, $50.000)</span>
+                <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20 items-center">
+                  <span className="text-text-primary font-semibold">Incluir Carrito (Opcional, $50.000)</span>
                   <input 
                     type="checkbox" 
                     checked={formData.includeCart}
                     onChange={(e) => setFormData(p => ({ ...p, includeCart: e.target.checked }))}
-                    className="w-4 h-4 rounded text-brand border-white/10"
+                    className="w-4 h-4 rounded text-brand border-slate-200/60 dark:border-slate-800"
                   />
                 </div>
-                <div className="p-4 flex justify-between bg-white/5 items-center">
-                  <span className="text-white font-semibold">Incluir Impresora de Video (Opcional, $120.000)</span>
+                <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20 items-center">
+                  <span className="text-text-primary font-semibold">Incluir Impresora de Video (Opcional, $120.000)</span>
                   <input 
                     type="checkbox" 
                     checked={formData.includePrinter}
                     onChange={(e) => setFormData(p => ({ ...p, includePrinter: e.target.checked }))}
-                    className="w-4 h-4 rounded text-brand border-white/10"
+                    className="w-4 h-4 rounded text-brand border-slate-200/60 dark:border-slate-800"
                   />
                 </div>
 
-                <div className="p-4 flex justify-between bg-white/5">
-                  <span className="text-white font-semibold">Envío / Logística (Requerido)</span>
-                  <span className="font-mono text-white">$50.000</span>
+                <div className="p-4 flex justify-between bg-slate-50/50 dark:bg-slate-950/20">
+                  <span className="text-text-primary font-semibold">Envío / Logística (Requerido)</span>
+                  <span className="font-mono text-text-primary">$50.000</span>
                 </div>
 
                 {/* Grand Total */}
@@ -686,26 +686,26 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
 
           {activeTab === 'documents' && (
             <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">Gestión de Contratos</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-text-muted block">Gestión de Contratos</span>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <button 
                   onClick={() => openPrintContract('blank')}
-                  className="p-4 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 flex flex-col items-center justify-center gap-2 hover:bg-white/10 text-white transition-colors"
+                  className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-850 bg-slate-50 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-900 flex flex-col items-center justify-center gap-2 text-text-primary transition-colors cursor-pointer"
                 >
-                  <FileText className="text-white/40" size={24} />
+                  <FileText className="text-text-muted" size={24} />
                   <span className="text-xs font-bold text-center">Imprimir Contrato Vacío</span>
                 </button>
 
                 <button 
                   onClick={() => openPrintContract('filled')}
-                  className="p-4 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 flex flex-col items-center justify-center gap-2 hover:bg-white/10 text-white transition-colors"
+                  className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-850 bg-slate-50 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-900 flex flex-col items-center justify-center gap-2 text-text-primary transition-colors cursor-pointer"
                 >
                   <ClipboardList className="text-brand" size={24} />
                   <span className="text-xs font-bold text-center">Contrato Rápido PDF</span>
                 </button>
 
-                <div className="p-4 rounded-xl border border-white/10 bg-white/5 flex flex-col items-center justify-center gap-2 text-white relative">
+                <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-850 bg-slate-50 dark:bg-slate-950/60 flex flex-col items-center justify-center gap-2 text-text-primary relative">
                   <Upload className="text-blue-400" size={24} />
                   <span className="text-xs font-bold text-center">Subir Contrato Firmado</span>
                   <input 
@@ -720,15 +720,15 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
               {formData.signedContractUrl && (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl flex items-center justify-between">
                   <span className="text-xs text-emerald-400 font-bold">Contrato digital firmado cargado</span>
-                  <a href={formData.signedContractUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-black text-white hover:underline uppercase">Ver Contrato</a>
+                  <a href={formData.signedContractUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-black text-text-primary hover:underline uppercase">Ver Contrato</a>
                 </div>
               )}
 
-              <hr className="border-white/10 my-4" />
+              <hr className="border-slate-200/60 dark:border-slate-800 my-4" />
 
-              <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">Comprobantes de Pago</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-text-muted block">Comprobantes de Pago</span>
 
-              <div className="p-4 rounded-xl border border-white/10 bg-white/5 flex flex-col items-center justify-center gap-2 text-white relative">
+              <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-850 bg-slate-50 dark:bg-slate-950/60 flex flex-col items-center justify-center gap-2 text-text-primary relative">
                 <Upload className="text-emerald-400" size={24} />
                 <span className="text-xs font-bold text-center">Subir Comprobante de Abono / Pago</span>
                 <input 
@@ -742,7 +742,7 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
               {formData.paymentReceiptUrl && (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl flex items-center justify-between">
                   <span className="text-xs text-emerald-400 font-bold">Comprobante de pago cargado</span>
-                  <a href={formData.paymentReceiptUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-black text-white hover:underline uppercase">Ver Soporte</a>
+                  <a href={formData.paymentReceiptUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-black text-text-primary hover:underline uppercase">Ver Soporte</a>
                 </div>
               )}
             </div>
@@ -750,19 +750,19 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
 
           {activeTab === 'notes' && (
             <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-wider text-white/40 block">Bitácora de Observaciones</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-text-muted block">Bitácora de Observaciones</span>
               
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {comments.length === 0 ? (
-                  <p className="text-xs text-white/30 text-center py-6">No hay anotaciones registradas en este alquiler.</p>
+                  <p className="text-xs text-text-placeholder text-center py-6">No hay anotaciones registradas en este alquiler.</p>
                 ) : (
                   comments.map((c, i) => (
-                    <div key={i} className="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <div key={i} className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-[10px] font-black text-brand uppercase tracking-wider">{c.user}</span>
-                        <span className="text-[10px] text-white/40">{c.date}</span>
+                        <span className="text-[10px] text-text-muted">{c.date}</span>
                       </div>
-                      <p className="text-xs text-white/80">{c.text}</p>
+                      <p className="text-xs text-text-secondary">{c.text}</p>
                     </div>
                   ))
                 )}
@@ -774,11 +774,11 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Escribe una observación operativa..."
-                  className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-brand"
+                  className="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary text-sm focus:outline-none focus:border-brand"
                 />
                 <button 
                   onClick={handleAddComment}
-                  className="px-4 py-2 bg-brand text-white font-bold rounded-xl text-xs hover:bg-brand/80 active:scale-95 transition-all"
+                  className="px-4 py-2 bg-brand text-white font-bold rounded-xl text-xs hover:bg-brand/80 active:scale-95 transition-all cursor-pointer"
                 >
                   Agregar
                 </button>
@@ -789,12 +789,12 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/10 shrink-0 bg-white/5 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 rounded-b-2xl">
+        <div className="px-6 py-4 border-t border-slate-200/60 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-950/40 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 rounded-b-2xl">
           <div>
             {bookingToEdit && (
               <button 
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-bold rounded-xl text-xs transition-colors w-full sm:w-auto"
+                className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 font-bold rounded-xl text-xs transition-colors w-full sm:w-auto cursor-pointer"
               >
                 Eliminar Reserva
               </button>
@@ -803,14 +803,14 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
           <div className="flex items-center gap-2 justify-end">
             <button 
               onClick={onClose} 
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold rounded-xl text-xs transition-colors w-full sm:w-auto"
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-text-secondary hover:text-text-primary font-bold rounded-xl text-xs transition-colors w-full sm:w-auto cursor-pointer"
             >
               Cancelar
             </button>
             <button 
               onClick={handleSave} 
               disabled={isLoading}
-              className="px-4 py-2 bg-brand text-white font-black rounded-xl text-xs hover:bg-brand/90 active:scale-95 transition-all w-full sm:w-auto flex items-center justify-center"
+              className="px-4 py-2 bg-brand text-white font-black rounded-xl text-xs hover:bg-brand/90 active:scale-95 transition-all w-full sm:w-auto flex items-center justify-center cursor-pointer"
             >
               {isLoading ? 'Guardando...' : 'Guardar Cambios'}
             </button>

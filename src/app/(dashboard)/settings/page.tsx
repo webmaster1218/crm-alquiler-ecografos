@@ -88,18 +88,18 @@ export default function SettingsPage() {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight uppercase italic">Configuración</h1>
-          <p className="text-white/50 text-xs mt-1">Administra tu perfil, el stock total de ecógrafos y preferencias del sistema.</p>
+          <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase italic">Configuración</h1>
+          <p className="text-text-secondary text-xs mt-1">Administra tu perfil, el stock total de ecógrafos y preferencias del sistema.</p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 shrink-0">
+        <div className="flex bg-slate-100/50 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-800 shrink-0">
           <button
             onClick={() => setSubTab('profile')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
               subTab === 'profile'
                 ? 'bg-brand/10 text-brand shadow-sm border border-brand/20'
-                : 'text-white/50 hover:text-white'
+                : 'text-text-muted hover:text-text-primary'
             }`}
           >
             <UserIcon size={12} />
@@ -108,10 +108,10 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setSubTab('inventory')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
               subTab === 'inventory'
                 ? 'bg-brand/10 text-brand shadow-sm border border-brand/20'
-                : 'text-white/50 hover:text-white'
+                : 'text-text-muted hover:text-text-primary'
             }`}
           >
             <Box size={12} />
@@ -122,22 +122,22 @@ export default function SettingsPage() {
 
       {/* RENDER PROFILE SUBTAB */}
       {subTab === 'profile' && (
-        <div className="bg-card border border-white/10 rounded-3xl p-8 shadow-sm space-y-6">
-          <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-white/10">
+        <div className="bg-card border border-slate-200/60 dark:border-slate-800 rounded-3xl p-8 shadow-sm space-y-6">
+          <div className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-slate-200/60 dark:border-slate-800">
             <Avatar name={state.currentUser?.name || ''} size="xl" className="shadow-2xl ring-4 ring-brand/10" />
             <div className="text-center md:text-left flex-1 space-y-1">
-               <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">{state.currentUser?.name}</h2>
+               <h2 className="text-xl font-black text-text-primary italic tracking-tighter uppercase">{state.currentUser?.name}</h2>
                <p className="text-brand font-black text-xs uppercase tracking-widest">{state.currentUser?.role}</p>
                <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
-                  <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                     <p className="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">Email</p>
-                     <p className="text-xs font-bold text-white mt-1">{state.currentUser?.email}</p>
+                  <div className="px-4 py-2 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                     <p className="text-[9px] font-black text-text-muted uppercase tracking-widest leading-none">Email</p>
+                     <p className="text-xs font-bold text-text-primary mt-1">{state.currentUser?.email}</p>
                   </div>
-                  <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                     <p className="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">Estado</p>
+                  <div className="px-4 py-2 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                     <p className="text-[9px] font-black text-text-muted uppercase tracking-widest leading-none">Estado</p>
                      <div className="flex items-center gap-2 mt-1.5">
                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                       <p className="text-xs font-bold text-white leading-none">{state.currentUser?.status}</p>
+                       <p className="text-xs font-bold text-text-primary leading-none">{state.currentUser?.status}</p>
                      </div>
                   </div>
                </div>
@@ -146,15 +146,15 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
              <div className="space-y-4">
-                <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] border-l-2 border-brand pl-3">Preferencias de Sistema</h3>
-                <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10">
+                <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] border-l-2 border-brand pl-3">Preferencias de Sistema</h3>
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-200/60 dark:border-slate-800">
                    <div>
-                      <p className="text-sm font-bold text-white tracking-tight uppercase">Modo Oscuro</p>
-                      <p className="text-[10px] font-bold text-white/40 uppercase mt-0.5">Activa la interfaz de alto contraste</p>
+                      <p className="text-sm font-bold text-text-primary tracking-tight uppercase">Modo Oscuro</p>
+                      <p className="text-[10px] font-bold text-text-muted uppercase mt-0.5">Activa la interfaz de alto contraste</p>
                    </div>
                    <button 
                      onClick={() => dispatch({ type: 'TOGGLE_DARK_MODE' })}
-                     className={`w-12 h-6 rounded-full transition-all relative ${state.darkMode ? 'bg-brand' : 'bg-white/15'}`}
+                     className={`w-12 h-6 rounded-full transition-all relative cursor-pointer ${state.darkMode ? 'bg-brand' : 'bg-slate-200 dark:bg-slate-800'}`}
                    >
                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${state.darkMode ? 'left-7' : 'left-1'}`}></div>
                    </button>
@@ -162,7 +162,7 @@ export default function SettingsPage() {
              </div>
 
              <div className="space-y-4">
-                <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] border-l-2 border-brand pl-3">Sesión</h3>
+                <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] border-l-2 border-brand pl-3">Sesión</h3>
                 <Button variant="danger" className="w-full justify-start h-14 px-5 rounded-2xl font-bold uppercase text-[10px] tracking-widest">
                    Cerrar todas las sesiones
                 </Button>
@@ -173,13 +173,13 @@ export default function SettingsPage() {
 
       {/* RENDER INVENTORY SUBTAB */}
       {subTab === 'inventory' && (
-        <form onSubmit={handleSaveInventory} className="bg-card border border-white/10 rounded-3xl p-8 shadow-sm space-y-6">
+        <form onSubmit={handleSaveInventory} className="bg-card border border-slate-200/60 dark:border-slate-800 rounded-3xl p-8 shadow-sm space-y-6">
           <div>
-            <h2 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
+            <h2 className="text-base font-black text-text-primary uppercase tracking-tight flex items-center gap-2">
               <Box size={18} className="text-brand" />
               <span>Inventario Global de Ecógrafos</span>
             </h2>
-            <p className="text-xs text-white/50 mt-1">Configura la cantidad total de máquinas físicas en tu stock. Estos números limitarán el máximo disponible para alquiler en las mismas fechas.</p>
+            <p className="text-xs text-text-secondary mt-1">Configura la cantidad total de máquinas físicas en tu stock. Estos números limitarán el máximo disponible para alquiler en las mismas fechas.</p>
           </div>
 
           {loading ? (
@@ -189,46 +189,46 @@ export default function SettingsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block">Stock Mindray Z6</label>
+                <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block">Stock Mindray Z6</label>
                 <input
                   type="number"
                   required
                   value={stock.z6}
                   onChange={e => setStock(prev => ({ ...prev, z6: Number(e.target.value) }))}
-                  className="w-full text-xs font-bold text-white bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
+                  className="w-full text-xs font-bold text-text-primary bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block">Stock Mindray Z60</label>
+                <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block">Stock Mindray Z60</label>
                 <input
                   type="number"
                   required
                   value={stock.z60}
                   onChange={e => setStock(prev => ({ ...prev, z60: Number(e.target.value) }))}
-                  className="w-full text-xs font-bold text-white bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
+                  className="w-full text-xs font-bold text-text-primary bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block">Stock Mindray M7</label>
+                <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block">Stock Mindray M7</label>
                 <input
                   type="number"
                   required
                   value={stock.m7}
                   onChange={e => setStock(prev => ({ ...prev, m7: Number(e.target.value) }))}
-                  className="w-full text-xs font-bold text-white bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
+                  className="w-full text-xs font-bold text-text-primary bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block">Stock Mindray MX3</label>
+                <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block">Stock Mindray MX3</label>
                 <input
                   type="number"
                   required
                   value={stock.mx3}
                   onChange={e => setStock(prev => ({ ...prev, mx3: Number(e.target.value) }))}
-                  className="w-full text-xs font-bold text-white bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
+                  className="w-full text-xs font-bold text-text-primary bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:border-brand"
                 />
               </div>
             </div>
