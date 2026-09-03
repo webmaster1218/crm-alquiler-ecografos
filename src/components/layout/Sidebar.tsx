@@ -22,7 +22,8 @@ import {
   Package,
   FileSpreadsheet,
   Calendar,
-  DollarSign
+  DollarSign,
+  Clock
 } from 'lucide-react';
 import { cn } from '../../types';
 
@@ -46,7 +47,9 @@ const routeMap: Record<string, string> = {
   reports: '/reports',
   settings: '/settings',
   alquileres: '/alquileres',
+  'por-confirmar': '/por-confirmar',
   calendario: '/calendario',
+  dispositivos: '/dispositivos',
   liquidacion: '/liquidacion',
 };
 
@@ -71,10 +74,14 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
       title: "Operaciones",
       items: [
         { id: 'alquileres', label: 'Alquileres', icon: ClipboardList, path: '/alquileres' },
+        { id: 'por-confirmar', label: 'Por Confirmar', icon: Clock, path: '/por-confirmar' },
+        { id: 'dispositivos', label: 'Ecógrafos & Stock', icon: Box, path: '/dispositivos' },
         { id: 'calendario', label: 'Calendario', icon: Calendar, path: '/calendario' },
         { id: 'tasks', label: 'Tareas', icon: CheckSquare },
       ]
     },
+
+
     {
       title: "Finanzas",
       items: [
@@ -99,9 +106,22 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
   ];
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    dispatch({ type: 'SET_USER', payload: null });
+    try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('admin_auth');
+        localStorage.removeItem('admin_auth');
+      }
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      dispatch({ type: 'SET_USER', payload: null });
+      router.push('/login');
+    }
   };
+
 
   const handleNav = (id: string, path?: string) => {
     if (path) {
@@ -128,20 +148,21 @@ export function Sidebar({ activeTab }: { activeTab?: string }) {
          {!collapsed ? (
             <div className="flex items-center gap-2 animate-in fade-in duration-300">
                <img 
-                 src="/icono-fabrica-winners-sin-fondo.png" 
-                 alt="Alquiler Ecografos Icon" 
-                 className="w-8 h-8 object-contain"
+                 src="/images/logo/logo_alquilerdeecografos.webp" 
+                 alt="Alquiler Ecógrafos Logo" 
+                 className="h-8 object-contain max-w-[150px]"
                />
-                <h1 className="text-[11px] font-black text-white tracking-tight uppercase italic">Alquiler<span className="text-brand-light">Ecografos</span></h1>
             </div>
          ) : (
             <img 
-              src="/icono-fabrica-winners-sin-fondo.png" 
-              alt="Alquiler Ecografos Icon" 
-              className="w-8 h-8 object-contain mx-auto"
+              src="/images/logo/logo-pestaña.webp" 
+              alt="Alquiler Ecógrafos Logo" 
+              className="w-7 h-7 object-contain mx-auto"
             />
          )}
       </div>
+
+
 
       <div className={cn(
         "flex-1 px-2 py-4 space-y-4 custom-scrollbar",

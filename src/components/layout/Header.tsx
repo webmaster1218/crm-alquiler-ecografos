@@ -41,10 +41,23 @@ export function Header({ activeTab }: { activeTab?: string }) {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    dispatch({ type: 'SET_USER', payload: null });
-    setMenuOpen(false);
+    try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('admin_auth');
+        localStorage.removeItem('admin_auth');
+      }
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      dispatch({ type: 'SET_USER', payload: null });
+      setMenuOpen(false);
+      router.push('/login');
+    }
   };
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -62,8 +75,9 @@ export function Header({ activeTab }: { activeTab?: string }) {
     <header className="h-14 bg-header sticky top-0 z-30 border-b border-white/10 flex items-center justify-between px-4 md:px-6">
       <div className="flex items-center gap-4 flex-1">
         <h2 className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] flex items-center gap-2">
-          Telocalizo Chats <span className="opacity-30">/</span> <span className="text-white italic tracking-tighter lowercase text-xs underline decoration-brand-light decoration-2 underline-offset-4">{activeTab}</span>
+          Alquiler de Ecógrafos <span className="opacity-30">/</span> <span className="text-white italic tracking-tighter lowercase text-xs underline decoration-brand-light decoration-2 underline-offset-4">{activeTab}</span>
         </h2>
+
 
         <div className="relative w-full max-w-sm group hidden xl:block">
           <div className="absolute inset-y-0 left-2.5 flex items-center pointer-events-none group-focus-within:text-brand-light text-white/40 transition-colors">

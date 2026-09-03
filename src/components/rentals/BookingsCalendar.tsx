@@ -89,8 +89,13 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                             break;
                     }
 
-                    const start = new Date(booking.start_date + 'T00:00:00');
-                    const end = new Date(booking.end_date + 'T23:59:59');
+                    // Create start date at 00:00:00 and end date at 23:59:59 using string components to avoid UTC offset issues
+                    const [sY, sM, sD] = (booking.start_date || '').split('-').map(Number);
+                    const [eY, eM, eD] = (booking.end_date || '').split('-').map(Number);
+
+
+                    const start = (sY && sM && sD) ? new Date(sY, sM - 1, sD, 0, 0, 0) : new Date();
+                    const end = (eY && eM && eD) ? new Date(eY, eM - 1, eD, 23, 59, 59) : start;
 
                     return {
                         id: booking.id,
@@ -104,6 +109,7 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                 });
                 setEvents(mappedEvents);
             }
+
         } catch (err) {
             console.error('Error in fetchBookings:', err);
         }

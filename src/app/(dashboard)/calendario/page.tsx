@@ -1,23 +1,34 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, FileSpreadsheet, RefreshCw } from 'lucide-react';
+import { Calendar as CalendarIcon, FileSpreadsheet, RefreshCw, Plus, ShieldAlert, Settings } from 'lucide-react';
+
 import { BookingsCalendar } from '../../../components/rentals/BookingsCalendar';
 import { AdminBookingModal } from '../../../components/rentals/AdminBookingModal';
+import StockSettingsModal from '../../../components/rentals/StockSettingsModal';
+import { RentalDetailView } from '../../../components/rentals/RentalDetailView';
 import { exportToExcel } from '../../../utils/exportUtils';
 import { supabase } from '../../../lib/supabaseClient';
 import Swal from 'sweetalert2';
 
 export default function CalendarioPage() {
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [viewingBookingId, setViewingBookingId] = useState<string | number | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showStockModal, setShowStockModal] = useState(false);
+  const [isBlockingMode, setIsBlockingMode] = useState(false);
   const [initialRange, setInitialRange] = useState<{ start: string; end: string } | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleEditBooking = (booking: any) => {
-    setSelectedBooking(booking);
-    setInitialRange(null);
-    setShowModal(true);
+    if (booking?.id) {
+      setViewingBookingId(booking.id);
+    } else {
+      setSelectedBooking(booking);
+      setInitialRange(null);
+      setIsBlockingMode(booking?.status === 'maintenance');
+      setShowModal(true);
+    }
   };
 
   const handleCreateBooking = (start: Date, end: Date) => {
@@ -26,8 +37,19 @@ export default function CalendarioPage() {
       start: start.toISOString().split('T')[0],
       end: end.toISOString().split('T')[0]
     });
+    setIsBlockingMode(false);
     setShowModal(true);
   };
+
+  if (viewingBookingId) {
+    return (
+      <RentalDetailView
+        bookingId={viewingBookingId}
+        onBack={() => setViewingBookingId(null)}
+        onUpdated={() => setRefreshKey(prev => prev + 1)}
+      />
+    );
+  }
 
   const handleExport = async () => {
     try {
@@ -68,34 +90,73 @@ export default function CalendarioPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase italic flex items-center gap-2">
             <CalendarIcon className="text-brand shrink-0" size={24} />
             Calendario Logístico
           </h1>
-          <p className="text-sm text-text-secondary">Planificación de despachos, recogidas y mantenimientos de ecógrafos.</p>
+          <p className="text-sm text-text-secondary">Planificación de despachos, recogidas y bloqueos técnicos de flota.</p>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {/* Ajustar Stock */}
+          <button
+            onClick={() => setShowStockModal(true)}
+            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-text-primary rounded-xl text-xs font-bold transition-all border border-slate-200/60 dark:border-slate-700 flex items-center gap-1.5 cursor-pointer"
+            title="Configurar inventario total de ecógrafos"
+          >
+            <Settings size={15} /> Ajustar Stock
+          </button>
+
+          {/* Bloquear Fechas */}
+          <button
+            onClick={() => {
+              setSelectedBooking(null);
+              setInitialRange(null);
+              setIsBlockingMode(true);
+              setShowModal(true);
+            }}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+          >
+            <ShieldAlert size={15} className="text-amber-400" /> Bloquear Fechas
+          </button>
+
+          {/* Nueva Reserva */}
+          <button
+            onClick={() => {
+              setSelectedBooking(null);
+              setInitialRange(null);
+              setIsBlockingMode(false);
+              setShowModal(true);
+            }}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer"
+          >
+            <Plus size={15} /> Nueva Reserva
+          </button>
+
           <button 
             onClick={handleExport}
-            className="px-4 py-2 bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-primary hover:bg-slate-200 dark:hover:bg-slate-900 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
+            className="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+            title="Exportar a Excel"
           >
-            <FileSpreadsheet size={14} /> Exportar Reporte
+            <FileSpreadsheet size={15} />
           </button>
+
           <button 
             onClick={() => setRefreshKey(prev => prev + 1)}
             className="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+            title="Actualizar calendario"
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={15} />
           </button>
         </div>
       </div>
 
       {/* Calendar Card */}
-      <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+      <div className="bg-card border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 rounded-3xl shadow-sm">
         <BookingsCalendar 
           key={refreshKey}
           onEditBooking={handleEditBooking}
@@ -103,7 +164,7 @@ export default function CalendarioPage() {
         />
       </div>
 
-      {/* Booking Modal */}
+      {/* Booking / Blocking Modal */}
       {showModal && (
         <AdminBookingModal
           isOpen={showModal}
@@ -114,8 +175,22 @@ export default function CalendarioPage() {
           }}
           bookingToEdit={selectedBooking}
           initialDateRange={initialRange}
+          isBlockingMode={isBlockingMode}
+        />
+      )}
+
+      {/* Stock Settings Modal */}
+      {showStockModal && (
+        <StockSettingsModal
+          isOpen={showStockModal}
+          onClose={() => setShowStockModal(false)}
+          onSuccess={() => {
+            setShowStockModal(false);
+            setRefreshKey(prev => prev + 1);
+          }}
         />
       )}
     </div>
   );
 }
+

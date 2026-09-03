@@ -93,231 +93,42 @@ export interface Task {
   description?: string;
 }
 
-export interface ShopifyMoney {
-  amount: string;
-  currencyCode: string;
-}
-
-export interface ShopifyLineItem {
-  id: string;
-  title: string;
-  quantity: number;
-  originalUnitPriceSet: {
-    presentmentMoney: ShopifyMoney;
-  };
-  image?: {
-    url: string;
-  } | null;
-  sku?: string;
-}
-
-export interface ShopifyCustomer {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  numberOfOrders?: number;
-}
-
-export interface ShopifyShippingAddress {
-  firstName: string;
-  lastName: string;
-  company?: string;
-  address1: string;
-  address2?: string;
-  city: string;
-  province?: string;
-  zip?: string;
-  country: string;
-  phone?: string;
-}
-
-export interface ShopifyShippingLine {
-  title: string;
-  code?: string;
-}
-
-export interface ShopifyFulfillmentOrder {
-  id: string;
-  status: string;
-  deliveryMethod?: {
-    methodType: string;
-  };
-}
-
-export interface ShopifyFulfillment {
-  id: string;
-  status: string;
-  trackingInfo?: Array<{
-    number?: string;
-    url?: string;
-    company?: string;
-  }>;
-}
-
-export interface ShopifyOrder {
-  id: string;
-  name: string;
-  createdAt: string;
-  cancelledAt?: string | null;
-  displayFinancialStatus: string;
-  displayFulfillmentStatus: string;
-  note?: string;
-  tags?: string | string[];
-  channelInformation?: {
-    channelDefinition?: {
-      channelName: string;
-    };
-  } | null;
-  totalPriceSet: {
-    presentmentMoney: ShopifyMoney;
-  };
-  subtotalPriceSet?: {
-    presentmentMoney: ShopifyMoney;
-  };
-  totalShippingPriceSet?: {
-    presentmentMoney: ShopifyMoney;
-  };
-  customer?: ShopifyCustomer | null;
-  shippingAddress?: ShopifyShippingAddress | null;
-  billingAddress?: ShopifyShippingAddress | null;
-  billingAddressMatchesShippingAddress?: boolean;
-  lineItems: {
-    edges: Array<{
-      node: ShopifyLineItem;
-    }>;
-  };
-  shippingLines?: {
-    edges: Array<{
-      node: ShopifyShippingLine;
-    }>;
-  };
-  shippingLine?: { title: string } | null;
-  fulfillments?: Array<{
-    id: string;
-    status: string;
-    trackingInfo?: Array<{
-      number?: string;
-      url?: string;
-      company?: string;
-    }>;
-  }>;
-  fulfillmentOrders?: {
-    edges: Array<{
-      node: ShopifyFulfillmentOrder;
-    }>;
-  };
-  paymentGatewayNames?: string[];
-  discountCodes?: string[];
-  risk?: { recommendation?: string } | null;
-  fullyPaid?: boolean;
-  cancelReason?: string | null;
-  confirmationNumber?: string;
-  sourceName?: string;
-  email?: string;
-  phone?: string;
-  poNumber?: string;
-  clientIp?: string;
-  returns?: {
-    edges: Array<{ node: { status: string } }>;
-  };
-  refunds?: Array<{ id: string; createdAt: string }>;
-  events?: {
-    edges: Array<{ node: { id: string; message?: string; createdAt: string } }>;
-  };
-}
-
-// ─── Hoko Types ─────────────────────────────────────────
-export interface HokoCustomer {
-  name: string;
-  email: string;
-  identification: string;
-  phone: string;
-  address: string;
-  city_id: string;
-  city?: string;
-}
-
-export interface HokoMeasures {
-  height: string;
-  width: string;
-  length: string;
-  weight: string;
-}
-
-export interface HokoOrder {
-  id: string;
-  delivery_state: string;
-  cellar_id?: string;
-  courier_id?: string;
-  warranty?: string;
-  payment?: string;
-  measures?: HokoMeasures;
-  external_id?: string;
-  customer?: HokoCustomer;
-  contain?: string;
-  declared_value?: string;
+export interface RentalBooking {
+  id: string | number;
   created_at?: string;
-  prev_page_url?: string | null;
-  next_page_url?: string | null;
-  guide?: HokoGuide;
+  client_name: string;
+  client_phone: string;
+  client_email?: string;
+  client_address: string;
+  client_type?: 'medico' | 'clinica' | 'ips' | 'otro';
+  document_number?: string;
+  tax_id?: string;
+  start_date: string;
+  end_date: string;
+  delivery_time?: string;
+  collection_time?: string;
+  quantity_z6: number;
+  quantity_z60: number;
+  quantity_m7: number;
+  quantity_mx3: number;
+  include_cart?: boolean;
+  include_printer?: boolean;
+  selected_transducers?: string[];
+  total_price: number | string;
+  status: 'pending_confirmation' | 'confirmed' | 'in_transit' | 'delivered' | 'completed' | 'cancelled' | 'maintenance';
+  notes?: string;
+  signed_contract_url?: string;
+  payment_receipt_url?: string;
+  serial_numbers?: string;
 }
 
-export interface HokoGuide {
-  id: string;
-  number: string;
-  state: string;
-  total_freight_store?: string;
-  courier_name?: string;
-}
-
-export interface HokoCity {
-  id: string;
-  name: string;
-  department?: string;
-}
-
-export interface HokoQuotation {
-  courier_id: number;
-  courier_name: string;
-  price: number;
-  delivered_days: string;
-  courier_logo?: string;
-  value?: number;
-}
-
-export const HOKO_ORDER_STATES: Record<string, string> = {
-  '1': 'Creada',
-  '2': 'En proceso',
-  '3': 'Despachada',
-  '4': 'Finalizada',
-  '5': 'Cancelada',
-  '6': 'En Novedad',
+export const BOOKING_STATUS_CONFIG: Record<string, { label: string; class: string }> = {
+  pending_confirmation: { label: 'Por confirmar', class: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
+  confirmed: { label: 'Confirmado', class: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+  in_transit: { label: 'En camino', class: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' },
+  delivered: { label: 'Entregado / Activo', class: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
+  completed: { label: 'Completado', class: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+  cancelled: { label: 'Cancelado', class: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
+  maintenance: { label: 'Mantenimiento', class: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
 };
 
-export const HOKO_GUIDE_STATES_CO: Record<string, string> = {
-  '0': 'Cancelada',
-  '1': 'Activa',
-  '2': 'Despachada',
-  '3': 'Entregada',
-  '4': 'Anulada',
-  '5': 'Generada',
-  '6': 'En Novedad',
-  '7': 'En Reparto',
-  '8': 'En Bodega',
-  '9': 'Reexpedición',
-  '10': 'Solucionada en Malla',
-  '11': 'Devolución',
-  '12': 'En Procesamiento',
-  '13': 'Recibido del Cliente',
-  '14': 'Redireccionado',
-  '15': 'En Espera de Ruta Domestica',
-  '16': 'Mercancía Recogida',
-  '17': 'Pagado',
-  '18': 'Error por Saldo',
-  '19': 'Pagado a Tienda',
-  '20': 'Devolución Cobrado',
-  '21': 'Error por API',
-  '22': 'Transportadora Invalida',
-};

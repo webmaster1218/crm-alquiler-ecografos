@@ -16,7 +16,7 @@ const tabFromPath = (pathname: string): string => {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false);
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const pathname = usePathname();
   const router = useRouter();
   const activeTab = tabFromPath(pathname);
@@ -27,9 +27,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   React.useEffect(() => {
     if (mounted && !state.currentUser) {
-      router.push('/login');
+      const authPin = typeof window !== 'undefined' ? sessionStorage.getItem('admin_auth') : null;
+      if (authPin === 'true') {
+        dispatch({
+          type: 'SET_USER',
+          payload: {
+            id: 'admin-master-id',
+            name: 'Administrador ECO',
+            email: 'admin@ecoespecializada.com',
+            role: 'Superadmin',
+            status: 'En línea',
+            activeConversations: 0,
+            lastAccess: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }
+        });
+      } else {
+        router.push('/login');
+      }
     }
-  }, [mounted, state.currentUser, router]);
+  }, [mounted, state.currentUser, router, dispatch]);
 
   React.useEffect(() => {
     if (state.darkMode) {
