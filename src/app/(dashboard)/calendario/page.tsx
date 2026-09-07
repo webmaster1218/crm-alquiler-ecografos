@@ -64,10 +64,12 @@ export default function CalendarioPage() {
         const headers = ['ID', 'Cliente', 'Celular', 'Direccion', 'F. Inicio', 'F. Fin', 'Equipos', 'Estado'];
         const rows = data.map(b => {
           const equipments = [];
-          if (b.quantity_z6 > 0) equipments.push(`${b.quantity_z6}x Z6`);
-          if (b.quantity_z60 > 0) equipments.push(`${b.quantity_z60}x Z60`);
-          if (b.quantity_m7 > 0) equipments.push(`${b.quantity_m7}x M7`);
-          if (b.quantity_mx3 > 0) equipments.push(`${b.quantity_mx3}x MX3`);
+          if (b.quantity_z6 > 0) equipments.push(b.quantity_z6 > 1 ? `${b.quantity_z6}x Mindray Z6` : 'Mindray Z6');
+          if (b.quantity_z60 > 0) equipments.push(b.quantity_z60 > 1 ? `${b.quantity_z60}x Mindray Z60` : 'Mindray Z60');
+          if (b.quantity_m7 > 0) equipments.push(b.quantity_m7 > 1 ? `${b.quantity_m7}x Mindray M7` : 'Mindray M7');
+          if (b.quantity_mx3 > 0) equipments.push(b.quantity_mx3 > 1 ? `${b.quantity_mx3}x Mindray MX3` : 'Mindray MX3');
+          if (b.include_printer) equipments.push('Impresora');
+          if (b.include_cart) equipments.push('Carrito');
 
           return {
             'ID': b.id,

@@ -11,7 +11,7 @@ export interface AvailabilityResult {
 // Fallback stock if Supabase fails or table is empty
 const DEFAULT_STOCK = {
     z6: 2,
-    z60: 2,
+    z60: 1,
     m7: 1,
     mx3: 1
 };

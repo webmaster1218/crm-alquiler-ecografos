@@ -16,7 +16,12 @@ import {
   AlertTriangle,
   Plus,
   FileText,
-  Clock
+  Clock,
+  MapPin,
+  Printer,
+  ShoppingBag,
+  CheckCircle2,
+  CalendarDays
 } from 'lucide-react';
 
 import { Badge } from '../shared/Badge';
@@ -144,37 +149,204 @@ export function RentalsDashboard({ mode = 'all' }: RentalsDashboardProps) {
     return matchesSearch && matchesStatus && matchesSegment;
   });
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'EC';
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+  };
+
+  const formatDateDisplay = (startDateStr: string, endDateStr: string) => {
+    if (!startDateStr) return { main: 'Sin fecha', sub: '', daysCount: 0 };
+    
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const [sy, sm, sd] = startDateStr.split('-').map(Number);
+
+    if (!endDateStr || startDateStr === endDateStr) {
+      return {
+        main: `${sd} ${months[sm - 1]} ${sy}`,
+        sub: '1 día de alquiler',
+        daysCount: 1
+      };
+    }
+
+    const [ey, em, ed] = endDateStr.split('-').map(Number);
+    const start = new Date(sy, sm - 1, sd);
+    const end = new Date(ey, em - 1, ed);
+    const daysCount = Math.max(1, Math.round(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+    let main = '';
+    if (sy === ey && sm === em) {
+      main = `${sd} — ${ed} ${months[sm - 1]} ${sy}`;
+    } else if (sy === ey) {
+      main = `${sd} ${months[sm - 1]} — ${ed} ${months[em - 1]} ${sy}`;
+    } else {
+      main = `${sd} ${months[sm - 1]} ${sy} — ${ed} ${months[em - 1]} ${ey}`;
+    }
+
+    return {
+      main,
+      sub: `${daysCount} ${daysCount === 1 ? 'día' : 'días'}`,
+      daysCount
+    };
+  };
+
+  const renderEquipmentBadges = (booking: any) => {
+    const items: React.ReactNode[] = [];
+
+    if (booking.quantity_z6 > 0) {
+      items.push(
+        <span key="z6" className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+          <span className="w-1 h-1 rounded-full bg-sky-500"></span>
+          Mindray Z6
+          {booking.quantity_z6 > 1 && (
+            <span className="ml-0.5 text-[9px] font-black">×{booking.quantity_z6}</span>
+          )}
+        </span>
+      );
+    }
+    if (booking.quantity_z60 > 0) {
+      items.push(
+        <span key="z60" className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+          <span className="w-1 h-1 rounded-full bg-indigo-500"></span>
+          Mindray Z60
+          {booking.quantity_z60 > 1 && (
+            <span className="ml-0.5 text-[9px] font-black">×{booking.quantity_z60}</span>
+          )}
+        </span>
+      );
+    }
+    if (booking.quantity_m7 > 0) {
+      items.push(
+        <span key="m7" className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+          <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+          Mindray M7
+          {booking.quantity_m7 > 1 && (
+            <span className="ml-0.5 text-[9px] font-black">×{booking.quantity_m7}</span>
+          )}
+        </span>
+      );
+    }
+    if (booking.quantity_mx3 > 0) {
+      items.push(
+        <span key="mx3" className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+          <span className="w-1 h-1 rounded-full bg-teal-500"></span>
+          Mindray MX3
+          {booking.quantity_mx3 > 1 && (
+            <span className="ml-0.5 text-[9px] font-black">×{booking.quantity_mx3}</span>
+          )}
+        </span>
+      );
+    }
+
+    if (booking.include_printer) {
+      items.push(
+        <span key="printer" className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+          <Printer size={9} className="text-slate-500 shrink-0" />
+          Impresora
+        </span>
+      );
+    }
+
+    if (booking.include_cart) {
+      items.push(
+        <span key="cart" className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+          <ShoppingBag size={9} className="text-slate-500 shrink-0" />
+          Carrito
+        </span>
+      );
+    }
+
+    return (
+      <div className="space-y-1">
+        <div className="flex flex-wrap items-center gap-1">
+          {items.length > 0 ? items : (
+            <span className="text-[10px] text-text-muted italic">Sin equipos</span>
+          )}
+        </div>
+        {booking.client_address && (
+          <div className="flex items-center gap-1 text-[10px] text-text-secondary">
+            <MapPin size={10} className="text-slate-400 shrink-0" />
+            <span className="truncate max-w-[200px]" title={booking.client_address}>
+              {booking.client_address}
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending_confirmation':
-        return <Badge variant="warning">Por Confirmar</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 whitespace-nowrap">
+            <Clock size={10} /> Por Confirmar
+          </span>
+        );
       case 'confirmed':
-        return <Badge variant="info">Confirmado</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 whitespace-nowrap">
+            <CheckCircle2 size={10} /> Confirmado
+          </span>
+        );
       case 'pending_delivery':
-        return <Badge variant="info">Pte. Entrega</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 whitespace-nowrap">
+            <Truck size={10} /> Pte. Entrega
+          </span>
+        );
       case 'in_transit':
-        return <Badge variant="info">En Camino</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 whitespace-nowrap">
+            <Truck size={10} /> En Camino
+          </span>
+        );
       case 'delivered':
-        return <Badge variant="success">Entregado / Activo</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+            <CheckCircle2 size={10} /> Entregado / Activo
+          </span>
+        );
       case 'pending_pickup':
-        return <Badge variant="danger">Pte. Recogida</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 whitespace-nowrap">
+            <AlertTriangle size={10} /> Pte. Recogida
+          </span>
+        );
       case 'completed':
-        return <Badge variant="default">Completado</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+            Completado
+          </span>
+        );
       case 'maintenance':
-        return <Badge variant="default" className="bg-slate-900 text-slate-100">Mantenimiento</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-900 text-slate-100 border border-slate-800 whitespace-nowrap">
+            Mantenimiento
+          </span>
+        );
       case 'cancelled':
-        return <Badge variant="default">Cancelado</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 whitespace-nowrap">
+            Cancelado
+          </span>
+        );
       default:
-        return <Badge variant="default">{status}</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 whitespace-nowrap">
+            {status}
+          </span>
+        );
     }
   };
 
   const getEquipmentSummary = (booking: any) => {
     const parts = [];
-    if (booking.quantity_z6 > 0) parts.push(`${booking.quantity_z6}x Z6`);
-    if (booking.quantity_z60 > 0) parts.push(`${booking.quantity_z60}x Z60`);
-    if (booking.quantity_m7 > 0) parts.push(`${booking.quantity_m7}x M7`);
-    if (booking.quantity_mx3 > 0) parts.push(`${booking.quantity_mx3}x MX3`);
+    if (booking.quantity_z6 > 0) parts.push(`${booking.quantity_z6}x Mindray Z6`);
+    if (booking.quantity_z60 > 0) parts.push(`${booking.quantity_z60}x Mindray Z60`);
+    if (booking.quantity_m7 > 0) parts.push(`${booking.quantity_m7}x Mindray M7`);
+    if (booking.quantity_mx3 > 0) parts.push(`${booking.quantity_mx3}x Mindray MX3`);
     if (booking.include_cart) parts.push('Carrito');
     if (booking.include_printer) parts.push('Impresora');
     return parts.join(', ') || 'Sin equipos';
@@ -440,71 +612,110 @@ export function RentalsDashboard({ mode = 'all' }: RentalsDashboardProps) {
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-950/20 border-b border-slate-200/60 dark:border-slate-800 text-text-muted text-[10px] font-black uppercase tracking-wider">
-                  <th className="px-6 py-4">Cliente</th>
-                  <th className="px-6 py-4">Fechas</th>
-                  <th className="px-6 py-4">Equipos Contratados</th>
-                  <th className="px-6 py-4">Valor Total</th>
-                  <th className="px-6 py-4">Pago</th>
-                  <th className="px-6 py-4">Estado</th>
-                  <th className="px-6 py-4 text-right">Acciones</th>
+                <tr className="bg-slate-50/80 dark:bg-slate-950/50 border-b border-slate-200/80 dark:border-slate-800 text-text-muted text-[10px] font-black uppercase tracking-wider">
+                  <th className="px-3 py-2.5 w-[22%]">Cliente</th>
+                  <th className="px-3 py-2.5 w-[16%] whitespace-nowrap">Fechas</th>
+                  <th className="px-3 py-2.5 w-[25%]">Equipos y Ubicación</th>
+                  <th className="px-3 py-2.5 w-[12%] whitespace-nowrap">Valor Total</th>
+                  <th className="px-3 py-2.5 w-[11%] whitespace-nowrap">Pago</th>
+                  <th className="px-3 py-2.5 w-[11%] whitespace-nowrap">Estado</th>
+                  <th className="px-2 py-2.5 w-[3%] text-right"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40 text-sm">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40 text-xs">
                 {filteredBookings.map((booking) => {
                   const isPaid = Boolean(booking.payment_receipt_url);
+                  const dateInfo = formatDateDisplay(booking.start_date, booking.end_date);
                   return (
                     <tr 
                       key={booking.id} 
                       onClick={() => {
                         setViewingBookingId(booking.id);
                       }}
-                      className="hover:bg-slate-50/50 dark:hover:bg-slate-950/30 transition-colors cursor-pointer group"
+                      className="hover:bg-blue-50/40 dark:hover:bg-blue-950/20 transition-all duration-150 cursor-pointer group"
                     >
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-text-primary">{booking.client_name}</div>
-                        <div className="text-[10px] text-text-secondary">{booking.client_email || 'Sin correo'}</div>
-                        <div className="text-[10px] font-semibold text-brand mt-0.5">{booking.document_number}</div>
+                      {/* Cliente */}
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500/10 to-indigo-500/10 text-brand font-black text-[10px] flex items-center justify-center shrink-0 border border-brand/20">
+                            {getInitials(booking.client_name)}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-bold text-text-primary group-hover:text-brand transition-colors text-xs leading-snug truncate max-w-[160px]" title={booking.client_name}>
+                              {booking.client_name || 'Sin nombre'}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              {booking.document_number && (
+                                <span className="inline-block text-[9px] font-mono font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-1 py-0.2 rounded border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+                                  {booking.document_number}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-text-secondary truncate max-w-[110px]" title={booking.client_email}>
+                                {booking.client_email || ''}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-text-primary font-semibold">{booking.start_date}</div>
-                        <div className="text-xs text-text-muted">al {booking.end_date}</div>
+
+                      {/* Fechas */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200/60 dark:border-blue-900/40">
+                            <CalendarDays size={12} />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-text-primary text-[11px] leading-tight">
+                              {dateInfo.main}
+                            </div>
+                            <div className="text-[9px] font-semibold text-text-muted mt-0.5 flex items-center gap-1">
+                              <span className="inline-block w-1 h-1 rounded-full bg-blue-500"></span>
+                              {dateInfo.sub}
+                            </div>
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-text-primary max-w-[280px] truncate">{getEquipmentSummary(booking)}</div>
-                        <div className="text-[10px] text-text-secondary mt-0.5">Dir: {booking.client_address}</div>
+
+                      {/* Equipos & Ubicación */}
+                      <td className="px-3 py-2.5">
+                        {renderEquipmentBadges(booking)}
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="font-mono font-bold text-text-primary">
+
+                      {/* Valor Total */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <div className="font-mono font-bold text-text-primary text-xs">
                           ${(Number(booking.total_price) || 0).toLocaleString('es-CO')}
-                        </span>
+                        </div>
+                        <div className="text-[9px] text-text-muted uppercase tracking-wider font-semibold">
+                          COP
+                        </div>
                       </td>
-                      <td className="px-6 py-4">
+
+                      {/* Pago */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         {isPaid ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
-                            ● Pagado
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Pagado
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
-                            ○ Sin Pago
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            Sin Pago
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+
+                      {/* Estado */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
                         {getStatusBadge(booking.status)}
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <Button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setViewingBookingId(booking.id);
-                          }} 
-                          variant="ghost" 
-                          size="sm"
-                          className="group-hover:bg-brand group-hover:text-white"
-                        >
-                          <ChevronRight size={16} />
-                        </Button>
+
+                      {/* Acciones */}
+                      <td className="px-2 py-2.5 text-right whitespace-nowrap">
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-brand group-hover:text-white transition-all ml-auto">
+                          <ChevronRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                        </div>
                       </td>
                     </tr>
                   );

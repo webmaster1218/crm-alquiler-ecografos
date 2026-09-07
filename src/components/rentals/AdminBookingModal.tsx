@@ -1,7 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, HeartPulse, User, Calendar, MapPin, Clock, Tag, Plus, Minus } from "lucide-react";
+import { 
+  X, 
+  HeartPulse, 
+  User, 
+  Calendar, 
+  MapPin, 
+  Clock, 
+  Tag, 
+  Plus, 
+  Minus,
+  Printer,
+  ShoppingBag,
+  Check,
+  ShieldAlert,
+  Stethoscope,
+  CalendarDays,
+  Trash2
+} from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabaseClient";
 import { checkAvailability } from "../../lib/availability";
 import { calculateDays, calculateTotalPrice } from "../../lib/pricing";
@@ -326,137 +343,208 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-2 md:p-4 overflow-y-auto">
-            <div className={`bg-white rounded-3xl md:rounded-[40px] w-full ${isBlockingMode ? 'max-w-3xl' : 'max-w-5xl'} shadow-2xl relative overflow-hidden my-auto border border-slate-200`}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 backdrop-blur-md p-3 md:p-6 overflow-y-auto">
+            <div className={`bg-white dark:bg-slate-900 rounded-3xl w-full ${isBlockingMode ? 'max-w-3xl' : 'max-w-5xl'} shadow-2xl relative overflow-hidden my-auto border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150`}>
 
                 {/* Header */}
-                <div className={`p-6 md:p-8 flex justify-between items-center text-white ${getHeaderColor()} shadow-lg`}>
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                            <HeartPulse size={32} />
+                <div className="px-6 md:px-8 py-4 bg-slate-950 border-b border-slate-800/90 flex justify-between items-center text-white">
+                    <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl flex items-center justify-center shrink-0">
+                            {isBlockingMode ? <ShieldAlert size={20} className="text-amber-400" /> : <Stethoscope size={20} className="text-blue-400" />}
                         </div>
                         <div>
-                            <h3 className="font-black text-2xl tracking-tight leading-none mb-1">
-                                {isBlockingMode ? 'Bloqueo Administrativo' : (bookingToEdit ? 'Gestionar Logística' : 'Nueva Reserva Manual')}
-                            </h3>
-                            <p className="text-white/80 text-xs font-bold uppercase tracking-[0.2em]">Alquiler de Ecógrafos Admin</p>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-black text-lg text-white tracking-tight leading-none">
+                                    {isBlockingMode ? 'Bloqueo Técnico de Flota' : (bookingToEdit ? 'Gestionar Logística de Reserva' : 'Nueva Reserva Manual')}
+                                </h3>
+                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                    Admin
+                                </span>
+                            </div>
+                            <p className="text-slate-400 text-xs font-medium mt-1">
+                                {isBlockingMode ? 'Bloqueo por mantenimiento o calibración técnica sin datos de cliente' : 'Control operativo de reserva, fechas de entrega y flota contratada'}
+                            </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="bg-white/10 hover:bg-white/20 p-2.5 rounded-full transition-all hover:rotate-90">
-                        <X size={24} />
+                    <button 
+                        onClick={onClose} 
+                        className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                        <X size={18} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 md:p-10">
-                    {isBlockingMode ? (
-                        /* ── BLOCKING MODE: Clean 2-column layout ── */
-                        <div className="space-y-8">
-                            <p className="text-slate-500 text-sm font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center gap-3">
-                                <span className="text-2xl">🔒</span> Esta herramienta bloquea los equipos en el calendario para mantenimiento o reservas internas sin registrar datos de cliente.
-                            </p>
+                <form onSubmit={handleSubmit}>
+                    <div className="p-6 md:p-8 space-y-6 max-h-[calc(85vh-130px)] overflow-y-auto">
+                        {isBlockingMode ? (
+                            /* ── BLOCKING MODE ── */
+                            <div className="space-y-6">
+                                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-medium flex items-center gap-3">
+                                    <ShieldAlert size={20} className="shrink-0 text-amber-500" />
+                                    <span>Esta herramienta bloquea los equipos en el calendario para mantenimiento o reservas internas sin asociar un cliente.</span>
+                                </div>
 
-                            <div className="grid grid-cols-1 gap-8">
-                                {/* Equipment - Full Width Massive Blocking */}
-                                <div className="space-y-6">
-                                    <h4 className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-3">
-                                        <HeartPulse size={16} /> Configuración de Bloqueo por Equipo
-                                    </h4>
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider pb-2 border-b border-slate-200 dark:border-slate-800">
+                                        <HeartPulse size={15} className="text-brand" />
+                                        <span>Equipos a Bloquear</span>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {[
-                                            { key: 'quantityZ6' as const, startKey: 'z6StartDate' as const, endKey: 'z6EndDate' as const, label: 'Mindray Z6', color: 'blue', max: availableStock.z6 },
-                                            { key: 'quantityZ60' as const, startKey: 'z60StartDate' as const, endKey: 'z60EndDate' as const, label: 'Mindray Z60', color: 'blue', max: availableStock.z60 },
-                                            { key: 'quantityM7' as const, startKey: 'm7StartDate' as const, endKey: 'm7EndDate' as const, label: 'Mindray M7', color: 'indigo', max: availableStock.m7 },
-                                            { key: 'quantityMx3' as const, startKey: 'mx3StartDate' as const, endKey: 'mx3EndDate' as const, label: 'Mindray MX3', color: 'indigo', max: availableStock.mx3 },
-                                        ].map(({ key, startKey, endKey, label, color, max }) => (
-                                            <div key={key} className={`bg-slate-50 p-6 rounded-3xl border ${formData[key] > 0 ? 'border-blue-200 bg-blue-50/30' : 'border-slate-100'} space-y-4 transition-all`}>
-                                                <div className="flex items-center justify-between">
-                                                    <span className={`text-xs font-black text-${color}-600 uppercase tracking-wider`}>{label}</span>
-                                                    <div className="flex items-center gap-3">
-                                                        <button type="button" onClick={() => setFormData(p => ({ ...p, [key]: Math.max(0, p[key] - 1) }))}
-                                                            className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm">
-                                                            <Minus size={14} />
-                                                        </button>
-                                                        <span className="w-8 text-center font-black text-xl text-slate-800">{formData[key]}</span>
-                                                        <button type="button" disabled={formData[key] >= max}
-                                                            onClick={() => setFormData(p => ({ ...p, [key]: Math.min(max, p[key] + 1) }))}
-                                                            className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm disabled:opacity-30">
-                                                            <Plus size={14} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                
-                                                {formData[key] > 0 && (
-                                                    <div className="grid grid-cols-2 gap-3 pt-2 animate-in fade-in slide-in-from-top-2">
-                                                        <div>
-                                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Desde</label>
-                                                            <input 
-                                                                type="date"
-                                                                value={formData[startKey]}
-                                                                onChange={e => setFormData({ ...formData, [startKey]: e.target.value })}
-                                                                className="w-full border-2 border-slate-100 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white text-xs font-semibold outline-none focus:border-blue-500"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Hasta</label>
-                                                            <input 
-                                                                type="date"
-                                                                value={formData[endKey]}
-                                                                min={formData[startKey]}
-                                                                onChange={e => setFormData({ ...formData, [endKey]: e.target.value })}
-                                                                className="w-full border-2 border-slate-100 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white text-xs font-semibold outline-none focus:border-blue-500"
-                                                            />
+                                            { key: 'quantityZ6' as const, startKey: 'z6StartDate' as const, endKey: 'z6EndDate' as const, label: 'Mindray Z6', max: availableStock.z6 },
+                                            { key: 'quantityZ60' as const, startKey: 'z60StartDate' as const, endKey: 'z60EndDate' as const, label: 'Mindray Z60', max: availableStock.z60 },
+                                            { key: 'quantityM7' as const, startKey: 'm7StartDate' as const, endKey: 'm7EndDate' as const, label: 'Mindray M7', max: availableStock.m7 },
+                                            { key: 'quantityMx3' as const, startKey: 'mx3StartDate' as const, endKey: 'mx3EndDate' as const, label: 'Mindray MX3', max: availableStock.mx3 },
+                                        ].map(({ key, startKey, endKey, label, max }) => {
+                                            const qty = formData[key];
+                                            return (
+                                                <div 
+                                                    key={key} 
+                                                    className={`p-4 rounded-2xl border transition-all space-y-3 ${
+                                                        qty > 0 
+                                                            ? 'border-brand/40 bg-brand/5 dark:bg-brand/10' 
+                                                            : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">{label}</span>
+                                                        <div className="flex items-center gap-2.5">
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setFormData(p => ({ ...p, [key]: Math.max(0, p[key] - 1) }))}
+                                                                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-brand cursor-pointer shadow-2xs"
+                                                            >
+                                                                <Minus size={12} />
+                                                            </button>
+                                                            <span className="w-6 text-center font-mono font-black text-base text-slate-900 dark:text-slate-100">{qty}</span>
+                                                            <button 
+                                                                type="button" 
+                                                                disabled={qty >= max}
+                                                                onClick={() => setFormData(p => ({ ...p, [key]: Math.min(max, p[key] + 1) }))}
+                                                                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-brand disabled:opacity-30 cursor-pointer shadow-2xs"
+                                                            >
+                                                                <Plus size={12} />
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                )}
 
-                                            </div>
-                                        ))}
+                                                    {qty > 0 && (
+                                                        <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                                                            <div>
+                                                                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Desde</label>
+                                                                <input 
+                                                                    type="date"
+                                                                    value={formData[startKey]}
+                                                                    onChange={e => setFormData({ ...formData, [startKey]: e.target.value })}
+                                                                    className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold outline-none focus:border-brand"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Hasta</label>
+                                                                <input 
+                                                                    type="date"
+                                                                    value={formData[endKey]}
+                                                                    min={formData[startKey]}
+                                                                    onChange={e => setFormData({ ...formData, [endKey]: e.target.value })}
+                                                                    className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold outline-none focus:border-brand"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        /* ── NORMAL MODE: 3-column layout ── */
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
+                        ) : (
+                            /* ── NORMAL MODE: Modern 3-column layout ── */
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                            {/* Column 1: Client Information */}
-                            <div className="space-y-8">
-                                <div>
-                                    <h4 className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">
-                                        <User size={16} /> Datos del Cliente
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Nombre Completo <span className="text-slate-300 font-normal lowercase">(Opcional)</span></label>
-                                            <input type="text" className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-semibold text-sm"
-                                                value={formData.clientName} onChange={e => setFormData({ ...formData, clientName: e.target.value })} />
+                                {/* Column 1: Client Information */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
+                                        <User size={15} className="text-brand" />
+                                        <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">Datos del Cliente</span>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                Nombre Completo <span className="lowercase font-normal text-slate-400">(Opcional)</span>
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Dr. Juan Pérez / Clínica Medellín..." 
+                                                className="w-full px-3.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:border-brand focus:ring-2 focus:ring-brand/10 outline-none transition-all placeholder:text-slate-400"
+                                                value={formData.clientName} 
+                                                onChange={e => setFormData({ ...formData, clientName: e.target.value })} 
+                                            />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4 items-start">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Documento (CC) <span className="text-slate-300 font-normal lowercase">(Opc)</span></label>
-                                                <input type="text" className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-semibold text-sm"
-                                                    value={formData.documentNumber} onChange={e => setFormData({ ...formData, documentNumber: e.target.value })} />
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                    Cédula (CC)
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="1037..." 
+                                                    className="w-full px-3 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:border-brand outline-none transition-all placeholder:text-slate-400"
+                                                    value={formData.documentNumber} 
+                                                    onChange={e => setFormData({ ...formData, documentNumber: e.target.value })} 
+                                                />
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">NIT / RUT <span className="text-[8px] opacity-40 lowercase font-normal">Opcional</span></label>
-                                                <input type="text" className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-semibold text-sm"
-                                                    value={formData.taxId} onChange={e => setFormData({ ...formData, taxId: e.target.value })} />
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                    NIT / RUT
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="9019..." 
+                                                    className="w-full px-3 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:border-brand outline-none transition-all placeholder:text-slate-400"
+                                                    value={formData.taxId} 
+                                                    onChange={e => setFormData({ ...formData, taxId: e.target.value })} 
+                                                />
                                             </div>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Teléfono WhatsApp <span className="text-slate-300 font-normal lowercase">(Opcional)</span></label>
-                                            <input type="text" className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-semibold text-sm"
-                                                value={formData.clientPhone} onChange={e => setFormData({ ...formData, clientPhone: e.target.value })} />
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                Teléfono WhatsApp <span className="lowercase font-normal text-slate-400">(Opcional)</span>
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="300 123 4567" 
+                                                className="w-full px-3.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:border-brand outline-none transition-all placeholder:text-slate-400"
+                                                value={formData.clientPhone} 
+                                                onChange={e => setFormData({ ...formData, clientPhone: e.target.value })} 
+                                            />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Email <span className="text-slate-300 font-normal lowercase">(Opcional)</span></label>
-                                            <input type="email" className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-semibold text-sm"
-                                                value={formData.clientEmail} onChange={e => setFormData({ ...formData, clientEmail: e.target.value })} />
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                Email <span className="lowercase font-normal text-slate-400">(Opcional)</span>
+                                            </label>
+                                            <input 
+                                                type="email" 
+                                                placeholder="medico@ejemplo.com" 
+                                                className="w-full px-3.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:border-brand outline-none transition-all placeholder:text-slate-400"
+                                                value={formData.clientEmail} 
+                                                onChange={e => setFormData({ ...formData, clientEmail: e.target.value })} 
+                                            />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Tipo de Cliente</label>
-                                            <select className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white outline-none font-semibold text-sm cursor-pointer"
-                                                value={formData.clientType} onChange={e => setFormData({ ...formData, clientType: e.target.value })}>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                Tipo de Cliente
+                                            </label>
+                                            <select 
+                                                className="w-full px-3 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-100 focus:border-brand outline-none transition-all cursor-pointer"
+                                                value={formData.clientType} 
+                                                onChange={e => setFormData({ ...formData, clientType: e.target.value })}
+                                            >
                                                 <option value="medico">Médico Independiente</option>
                                                 <option value="clinica">Clínica / IPS</option>
                                                 <option value="movil">Servicio Móvil</option>
@@ -464,29 +552,32 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Column 2: Logistics & Schedule */}
-                            <div className="space-y-8">
-                                <div>
-                                    <h4 className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">
-                                        <Clock size={16} /> Logística y Horarios
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4 items-start">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Fecha Entrega</label>
+                                {/* Column 2: Logistics & Schedule */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
+                                        <Clock size={15} className="text-brand" />
+                                        <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">Logística y Horarios</span>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Fecha Entrega</label>
                                                 <input 
                                                     type="date"
                                                     value={formData.startDate}
                                                     onChange={e => setFormData({ ...formData, startDate: e.target.value })}
-                                                    className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white font-semibold outline-none text-xs md:text-sm cursor-pointer h-[50px] md:h-[52px]"
+                                                    className="w-full px-2.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-semibold text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-brand cursor-pointer"
                                                 />
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Horario Entrega <span className="text-slate-300 font-normal lowercase">(Opc)</span></label>
-                                                <select className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white font-semibold outline-none text-xs md:text-sm cursor-pointer h-[50px] md:h-[52px]"
-                                                    value={formData.deliveryTime} onChange={e => setFormData({ ...formData, deliveryTime: e.target.value })}>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Horario Entrega</label>
+                                                <select 
+                                                    className="w-full px-2 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-medium text-xs text-slate-800 dark:text-slate-100 outline-none focus:border-brand cursor-pointer"
+                                                    value={formData.deliveryTime} 
+                                                    onChange={e => setFormData({ ...formData, deliveryTime: e.target.value })}
+                                                >
                                                     <option value="">Selección...</option>
                                                     <option value="7:00 AM - 8:00 AM">7:00 AM - 8:00 AM</option>
                                                     <option value="8:00 AM - 9:00 AM">8:00 AM - 9:00 AM</option>
@@ -495,21 +586,25 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4 items-start">
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Fecha Recogida</label>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Fecha Recogida</label>
                                                 <input 
                                                     type="date"
                                                     value={formData.endDate}
                                                     min={formData.startDate}
                                                     onChange={e => setFormData({ ...formData, endDate: e.target.value })}
-                                                    className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white font-semibold outline-none text-xs md:text-sm cursor-pointer h-[50px] md:h-[52px]"
+                                                    className="w-full px-2.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-semibold text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-brand cursor-pointer"
                                                 />
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Horario Recogida <span className="text-slate-300 font-normal lowercase">(Opc)</span></label>
-                                                <select className="w-full border-2 border-slate-100 rounded-2xl px-4 py-3 bg-slate-50 focus:bg-white font-semibold outline-none text-xs md:text-sm cursor-pointer h-[50px] md:h-[52px]"
-                                                    value={formData.collectionTime} onChange={e => setFormData({ ...formData, collectionTime: e.target.value })}>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Horario Recogida</label>
+                                                <select 
+                                                    className="w-full px-2 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-medium text-xs text-slate-800 dark:text-slate-100 outline-none focus:border-brand cursor-pointer"
+                                                    value={formData.collectionTime} 
+                                                    onChange={e => setFormData({ ...formData, collectionTime: e.target.value })}
+                                                >
                                                     <option value="">Selección...</option>
                                                     <option value="5:00 PM - 6:00 PM">5:00 PM - 6:00 PM</option>
                                                     <option value="6:00 PM - 7:00 PM">6:00 PM - 7:00 PM</option>
@@ -517,199 +612,266 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Dirección <span className="text-slate-300 font-normal lowercase">(Opcional)</span></label>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                Dirección de Entrega <span className="lowercase font-normal text-slate-400">(Opcional)</span>
+                                            </label>
                                             <div className="relative">
-                                                <MapPin className="absolute left-4 top-4 text-slate-300" size={18} />
-                                                <textarea rows={2} className="w-full border-2 border-slate-100 rounded-2xl pl-11 pr-5 py-3.5 bg-slate-50 focus:bg-white font-semibold outline-none resize-none text-sm"
-                                                    placeholder="Calle 123 #45-67, Edificio... Medellín"
-                                                    value={formData.clientAddress} onChange={e => setFormData({ ...formData, clientAddress: e.target.value })} />
+                                                <MapPin className="absolute left-3.5 top-2.5 text-slate-400" size={15} />
+                                                <textarea 
+                                                    rows={2} 
+                                                    className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-semibold outline-none resize-none text-xs text-slate-900 dark:text-slate-100 focus:border-brand placeholder:text-slate-400"
+                                                    placeholder="Calle 123 #45-67, Consultorio 501, Medellín..."
+                                                    value={formData.clientAddress} 
+                                                    onChange={e => setFormData({ ...formData, clientAddress: e.target.value })} 
+                                                />
                                             </div>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1 block">Estado del Servicio</label>
-                                            <select className="w-full border-2 border-slate-100 rounded-2xl px-5 py-3.5 bg-slate-50 focus:bg-white font-bold text-slate-800 outline-none text-sm cursor-pointer"
-                                                value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
-                                                <option value="pending_delivery">🟡 Pendiente de Entregar</option>
-                                                <option value="delivered">🟢 Entregado (En Cliente)</option>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                                                Estado del Servicio
+                                            </label>
+                                            <select 
+                                                className="w-full px-3 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-bold text-xs text-slate-800 dark:text-slate-100 outline-none focus:border-brand cursor-pointer"
+                                                value={formData.status} 
+                                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                            >
+                                                <option value="pending_confirmation">🟡 Por Confirmar (Sin Pago)</option>
+                                                <option value="confirmed">🔵 Confirmado</option>
+                                                <option value="pending_delivery">🟣 Pendiente de Entregar</option>
+                                                <option value="delivered">🟢 Entregado / Activo en Cliente</option>
                                                 <option value="pending_pickup">🔴 Pendiente por Recoger</option>
-                                                <option value="completed">⚫ Finalizado</option>
+                                                <option value="completed">⚪ Finalizado</option>
                                                 <option value="maintenance">🛠️ Bloqueo / Mantenimiento</option>
                                                 <option value="cancelled">❌ Cancelado</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Column 3: Equipment & Extras */}
-                            <div className="space-y-8">
-                                <div>
-                                    <h4 className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">
-                                        <Tag size={16} /> Equipaje y Transductores
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="flex flex-col items-center bg-slate-50 p-4 rounded-3xl border border-slate-100 relative">
-                                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider mb-2">Mindray Z6</span>
-                                                <div className="flex items-center gap-3">
-                                                    <button type="button" onClick={() => setFormData(p => ({ ...p, quantityZ6: Math.max(0, p.quantityZ6 - 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-                                                        <Minus size={14} />
-                                                    </button>
-                                                    <span className="w-8 text-center font-black text-xl text-slate-800">{formData.quantityZ6}</span>
-                                                    <button type="button" disabled={formData.quantityZ6 >= availableStock.z6}
-                                                        onClick={() => setFormData(p => ({ ...p, quantityZ6: Math.min(availableStock.z6, p.quantityZ6 + 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed">
-                                                        <Plus size={14} />
-                                                    </button>
-                                                </div>
-                                                <div className="absolute -top-2 right-2 px-2 py-0.5 bg-blue-600 text-[8px] font-black text-white rounded-full shadow-sm">
-                                                    Disp: {availableStock.z6 - formData.quantityZ6}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center bg-slate-50 p-4 rounded-3xl border border-slate-100 relative">
-                                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider mb-2">Mindray Z60</span>
-                                                <div className="flex items-center gap-3">
-                                                    <button type="button" onClick={() => setFormData(p => ({ ...p, quantityZ60: Math.max(0, p.quantityZ60 - 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-                                                        <Minus size={14} />
-                                                    </button>
-                                                    <span className="w-8 text-center font-black text-xl text-slate-800">{formData.quantityZ60}</span>
-                                                    <button type="button" disabled={formData.quantityZ60 >= availableStock.z60}
-                                                        onClick={() => setFormData(p => ({ ...p, quantityZ60: Math.min(availableStock.z60, p.quantityZ60 + 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed">
-                                                        <Plus size={14} />
-                                                    </button>
-                                                </div>
-                                                <div className="absolute -top-2 right-2 px-2 py-0.5 bg-blue-600 text-[8px] font-black text-white rounded-full shadow-sm">
-                                                    Disp: {availableStock.z60 - formData.quantityZ60}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center bg-slate-50 p-4 rounded-3xl border border-slate-100 relative">
-                                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider mb-2">Mindray M7</span>
-                                                <div className="flex items-center gap-3">
-                                                    <button type="button" onClick={() => setFormData(p => ({ ...p, quantityM7: Math.max(0, p.quantityM7 - 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-                                                        <Minus size={14} />
-                                                    </button>
-                                                    <span className="w-8 text-center font-black text-xl text-slate-800">{formData.quantityM7}</span>
-                                                    <button type="button" disabled={formData.quantityM7 >= availableStock.m7}
-                                                        onClick={() => setFormData(p => ({ ...p, quantityM7: Math.min(availableStock.m7, p.quantityM7 + 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed">
-                                                        <Plus size={14} />
-                                                    </button>
-                                                </div>
-                                                <div className="absolute -top-2 right-2 px-2 py-0.5 bg-blue-600 text-[8px] font-black text-white rounded-full shadow-sm">
-                                                    Disp: {availableStock.m7 - formData.quantityM7}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-center bg-slate-50 p-4 rounded-3xl border border-slate-100 relative">
-                                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider mb-2">Mindray MX3</span>
-                                                <div className="flex items-center gap-3">
-                                                    <button type="button" onClick={() => setFormData(p => ({ ...p, quantityMx3: Math.max(0, p.quantityMx3 - 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm">
-                                                        <Minus size={14} />
-                                                    </button>
-                                                    <span className="w-8 text-center font-black text-xl text-slate-800">{formData.quantityMx3}</span>
-                                                    <button type="button" disabled={formData.quantityMx3 >= availableStock.mx3}
-                                                        onClick={() => setFormData(p => ({ ...p, quantityMx3: Math.min(availableStock.mx3, p.quantityMx3 + 1) }))}
-                                                        className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed">
-                                                        <Plus size={14} />
-                                                    </button>
-                                                </div>
-                                                <div className="absolute -top-2 right-2 px-2 py-0.5 bg-blue-600 text-[8px] font-black text-white rounded-full shadow-sm">
-                                                    Disp: {availableStock.mx3 - formData.quantityMx3}
-                                                </div>
+                                {/* Column 3: Equipment & Extras */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
+                                        <Tag size={15} className="text-brand" />
+                                        <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">Equipos y Accesorios</span>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            {[
+                                                { key: 'quantityZ6' as const, label: 'Mindray Z6', max: availableStock.z6 },
+                                                { key: 'quantityZ60' as const, label: 'Mindray Z60', max: availableStock.z60 },
+                                                { key: 'quantityM7' as const, label: 'Mindray M7', max: availableStock.m7 },
+                                                { key: 'quantityMx3' as const, label: 'Mindray MX3', max: availableStock.mx3 },
+                                            ].map(({ key, label, max }) => {
+                                                const qty = formData[key];
+                                                const available = max - qty;
+                                                return (
+                                                    <div 
+                                                        key={key} 
+                                                        className={`p-2.5 rounded-2xl border transition-all ${
+                                                            qty > 0 
+                                                                ? 'border-brand/40 bg-brand/5 dark:bg-brand/10' 
+                                                                : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center justify-between gap-1 mb-1.5">
+                                                            <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100 truncate">{label}</span>
+                                                            <span className={`text-[8px] font-bold px-1.5 py-0.2 rounded-full border ${
+                                                                available > 0 
+                                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                                                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 border-slate-300 dark:border-slate-700'
+                                                            }`}>
+                                                                Disp: {available}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setFormData(p => ({ ...p, [key]: Math.max(0, p[key] - 1) }))}
+                                                                className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-brand cursor-pointer shadow-2xs"
+                                                            >
+                                                                <Minus size={11} />
+                                                            </button>
+                                                            <span className="font-mono font-black text-sm text-slate-900 dark:text-slate-100">{qty}</span>
+                                                            <button 
+                                                                type="button" 
+                                                                disabled={qty >= max}
+                                                                onClick={() => setFormData(p => ({ ...p, [key]: Math.min(max, p[key] + 1) }))}
+                                                                className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-brand disabled:opacity-30 cursor-pointer shadow-2xs"
+                                                            >
+                                                                <Plus size={11} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div className="p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">Transductores</span>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {['Convexo', 'Lineal', 'Transvaginal', 'Sectorial'].map(t => {
+                                                    const isSelected = formData.selectedTransducers.includes(t);
+                                                    return (
+                                                        <button 
+                                                            key={t} 
+                                                            type="button" 
+                                                            onClick={() => toggleTransducer(t)}
+                                                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                                                                isSelected 
+                                                                    ? 'bg-brand text-white border-brand shadow-2xs' 
+                                                                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-brand/30'
+                                                            }`}
+                                                        >
+                                                            {t}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
 
-                                        <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-3">Transductores</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {['Convexo', 'Lineal', 'Transvaginal', 'Sectorial'].map(t => (
-                                                    <button key={t} type="button" onClick={() => toggleTransducer(t)}
-                                                        className={`px-4 py-2 rounded-full text-xs font-bold border-2 transition-all ${formData.selectedTransducers.includes(t) ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-white border-slate-100 text-slate-500 hover:border-blue-200'}`}>
-                                                        {t}
-                                                    </button>
-                                                ))}
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            <div 
+                                                onClick={() => setFormData(p => ({ ...p, includeCart: !p.includeCart }))}
+                                                className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                                                    formData.includeCart 
+                                                        ? 'bg-brand/5 border-brand/40 dark:bg-brand/10' 
+                                                        : 'bg-slate-50/50 dark:bg-slate-950/40 border-slate-200/80 dark:border-slate-800 hover:border-brand/30'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                                                        formData.includeCart ? 'bg-brand text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                                    }`}>
+                                                        <ShoppingBag size={13} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight">Carrito</div>
+                                                        <div className="text-[9px] text-slate-400">Base Rodable</div>
+                                                    </div>
+                                                </div>
+                                                <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                                                    formData.includeCart ? 'bg-brand border-brand text-white' : 'border-slate-300 dark:border-slate-700'
+                                                }`}>
+                                                    {formData.includeCart && <Check size={10} strokeWidth={3} />}
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div className="space-y-3">
-                                            <div className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${formData.includeCart ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100'}`}
-                                                onClick={() => setFormData(p => ({ ...p, includeCart: !p.includeCart }))}>
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.includeCart ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>🛒</div>
-                                                    <span className="text-xs font-black text-slate-700">Base Rodable (Carrito)</span>
+                                            <div 
+                                                onClick={() => setFormData(p => ({ ...p, includePrinter: !p.includePrinter }))}
+                                                className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                                                    formData.includePrinter 
+                                                        ? 'bg-brand/5 border-brand/40 dark:bg-brand/10' 
+                                                        : 'bg-slate-50/50 dark:bg-slate-950/40 border-slate-200/80 dark:border-slate-800 hover:border-brand/30'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                                                        formData.includePrinter ? 'bg-brand text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                                    }`}>
+                                                        <Printer size={13} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight">Impresora</div>
+                                                        <div className="text-[9px] text-slate-400">Sony Térmica</div>
+                                                    </div>
                                                 </div>
-                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.includeCart ? 'bg-blue-600 border-blue-600' : 'border-slate-200'}`}>
-                                                    {formData.includeCart && <X size={12} className="text-white rotate-45" strokeWidth={4} />}
-                                                </div>
-                                            </div>
-                                            <div className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${formData.includePrinter ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100'}`}
-                                                onClick={() => setFormData(p => ({ ...p, includePrinter: !p.includePrinter }))}>
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${formData.includePrinter ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>🖨️</div>
-                                                    <span className="text-xs font-black text-slate-700">Impresora Sony</span>
-                                                </div>
-                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.includePrinter ? 'bg-blue-600 border-blue-600' : 'border-slate-200'}`}>
-                                                    {formData.includePrinter && <X size={12} className="text-white rotate-45" strokeWidth={4} />}
+                                                <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                                                    formData.includePrinter ? 'bg-brand border-brand text-white' : 'border-slate-300 dark:border-slate-700'
+                                                }`}>
+                                                    {formData.includePrinter && <Check size={10} strokeWidth={3} />}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     {/* Footer */}
-                    <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <div className="flex items-center gap-6 w-full md:w-auto">
+                    <div className="px-6 md:px-8 py-3.5 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
                             {bookingToEdit && (
-                                <button disabled={isLoading} type="button" onClick={() => setShowDeleteConfirm(true)}
-                                    className="px-8 bg-red-50 text-red-600 font-bold py-4 rounded-2xl hover:bg-red-100 transition-all">
+                                <button 
+                                    disabled={isLoading} 
+                                    type="button" 
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                    className="px-4 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <Trash2 size={13} />
                                     {isBlockingMode ? 'Eliminar Bloqueo' : 'Eliminar Reserva'}
                                 </button>
                             )}
                         </div>
-                        <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+
+                        <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
                             {!isBlockingMode && (
-                                <div className="text-right hidden sm:block mr-2">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Inversión Total</p>
-                                    <p className="text-2xl font-black text-slate-900 leading-none">${getTotalPrice().toLocaleString()}</p>
+                                <div className="text-right">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Estimado</p>
+                                    <p className="text-lg font-black text-slate-900 dark:text-slate-100 font-mono leading-none mt-0.5">
+                                        ${getTotalPrice().toLocaleString('es-CO')} <span className="text-[10px] font-bold text-slate-400 font-sans">COP</span>
+                                    </p>
                                 </div>
                             )}
-                            <button disabled={isLoading} type="submit"
-                                className={`flex-1 md:flex-none px-12 text-white font-black py-4 rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1 disabled:opacity-50 disabled:translate-y-0 text-lg ${isBlockingMode ? 'bg-slate-900 hover:bg-black' : 'bg-slate-900 hover:bg-slate-800'}`}>
-                                {isLoading ? 'Procesando...' : (
+
+                            <button 
+                                type="button" 
+                                onClick={onClose}
+                                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button 
+                                disabled={isLoading} 
+                                type="submit"
+                                className="px-6 py-2 rounded-xl bg-brand hover:bg-brand-hover text-white text-xs font-black shadow-md shadow-brand/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full"></span>
+                                        Procesando...
+                                    </>
+                                ) : (
                                     isBlockingMode
                                         ? (bookingToEdit ? 'Actualizar Bloqueo' : 'Confirmar Bloqueo')
-                                        : (bookingToEdit ? 'Actualizar Logística' : 'Guardar Nueva Reserva')
+                                        : (bookingToEdit ? 'Guardar Cambios' : 'Crear Reserva')
                                 )}
                             </button>
                         </div>
                     </div>
                 </form>
 
-                {/* Delete Confirm */}
+                {/* Delete Confirm Overlay */}
                 {showDeleteConfirm && (
-                    <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-10 z-10 rounded-3xl md:rounded-[40px]">
-                        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
-                            <X size={40} className="text-red-600" />
-                        </div>
-                        <h3 className="font-black text-2xl text-slate-900 mb-2">{isBlockingMode ? '¿Eliminar Bloqueo?' : '¿Eliminar Reserva?'}</h3>
-                        <p className="text-slate-500 text-center mb-10">Esta acción es irreversible y no se puede deshacer.</p>
-                        <div className="flex gap-4">
-                            <button onClick={() => setShowDeleteConfirm(false)}
-                                className="px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-all">
-                                Cancelar
-                            </button>
-                            <button disabled={isLoading} onClick={handleDelete}
-                                className="px-8 py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition-all disabled:opacity-50">
-                                {isLoading ? 'Eliminando...' : 'Sí, eliminar'}
-                            </button>
+                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 z-10 animate-in fade-in">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl max-w-sm w-full text-center shadow-2xl">
+                            <div className="w-12 h-12 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <Trash2 size={24} />
+                            </div>
+                            <h3 className="font-black text-lg text-slate-900 dark:text-slate-100 mb-1">
+                                {isBlockingMode ? '¿Eliminar Bloqueo?' : '¿Eliminar Reserva?'}
+                            </h3>
+                            <p className="text-slate-500 text-xs mb-6">Esta acción es irreversible y eliminará el registro de la base de datos.</p>
+                            <div className="flex gap-2.5 justify-center">
+                                <button 
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-200 transition-all cursor-pointer"
+                                >
+                                    Cancelar
+                                </button>
+                                <button 
+                                    disabled={isLoading} 
+                                    onClick={handleDelete}
+                                    className="px-5 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 transition-all disabled:opacity-50 cursor-pointer"
+                                >
+                                    {isLoading ? 'Eliminando...' : 'Sí, eliminar'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -717,3 +879,4 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
         </div>
     );
 }
+

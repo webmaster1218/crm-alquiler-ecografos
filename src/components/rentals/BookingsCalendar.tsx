@@ -35,6 +35,50 @@ interface BookingsCalendarProps {
   onCreateBooking?: (start: Date, end: Date) => void;
 }
 
+const CustomEventComponent = ({ event }: { event: CalendarEvent }) => {
+    const b = event.resource;
+    const isMaintenance = b?.status === 'maintenance';
+
+    const equipList: string[] = [];
+    if (b?.quantity_z6 > 0) equipList.push(b.quantity_z6 > 1 ? `Z6 ×${b.quantity_z6}` : 'Z6');
+    if (b?.quantity_z60 > 0) equipList.push(b.quantity_z60 > 1 ? `Z60 ×${b.quantity_z60}` : 'Z60');
+    if (b?.quantity_m7 > 0) equipList.push(b.quantity_m7 > 1 ? `M7 ×${b.quantity_m7}` : 'M7');
+    if (b?.quantity_mx3 > 0) equipList.push(b.quantity_mx3 > 1 ? `MX3 ×${b.quantity_mx3}` : 'MX3');
+
+    const equipShort = equipList.length > 0 ? equipList.join(' + ') : 'Ecógrafo';
+
+    if (isMaintenance) {
+        return (
+            <div className="flex items-center gap-1.5 overflow-hidden text-xs py-0.5" title={event.title}>
+                <span className="shrink-0 text-amber-300 text-[10px]">🔧</span>
+                <span className="font-bold uppercase tracking-wider text-[9px] bg-amber-500/25 text-amber-200 px-1 py-0.2 rounded">
+                    Mant.
+                </span>
+                <span className="font-semibold truncate text-[11px] opacity-95">
+                    {equipShort}
+                </span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-center gap-1.5 overflow-hidden text-xs py-0.5 w-full" title={event.title}>
+            <span className="shrink-0 px-1.5 py-0.2 rounded font-black text-[9px] uppercase tracking-wider bg-black/25 text-white border border-white/10 shadow-2xs">
+                {equipShort}
+            </span>
+            {b?.include_printer && (
+                <span className="text-[10px] shrink-0" title="Incluye Impresora">🖨️</span>
+            )}
+            {b?.include_cart && (
+                <span className="text-[10px] shrink-0" title="Incluye Carrito">🛒</span>
+            )}
+            <span className="font-bold truncate text-[11px] tracking-tight opacity-95">
+                {b?.client_name || 'Sin nombre'}
+            </span>
+        </div>
+    );
+};
+
 export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCalendarProps) {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [view, setView] = useState<View>('month');
@@ -55,15 +99,18 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
             if (data) {
                 const mappedEvents: CalendarEvent[] = data.map(booking => {
                     let titleParts = [];
-                    if (booking.quantity_z6 > 0) titleParts.push(`${booking.quantity_z6}x Z6`);
-                    if (booking.quantity_z60 > 0) titleParts.push(`${booking.quantity_z60}x Z60`);
-                    if (booking.quantity_m7 > 0) titleParts.push(`${booking.quantity_m7}x M7`);
-                    if (booking.quantity_mx3 > 0) titleParts.push(`${booking.quantity_mx3}x MX3`);
+                    if (booking.quantity_z6 > 0) titleParts.push(booking.quantity_z6 > 1 ? `Mindray Z6 (×${booking.quantity_z6})` : 'Mindray Z6');
+                    if (booking.quantity_z60 > 0) titleParts.push(booking.quantity_z60 > 1 ? `Mindray Z60 (×${booking.quantity_z60})` : 'Mindray Z60');
+                    if (booking.quantity_m7 > 0) titleParts.push(booking.quantity_m7 > 1 ? `Mindray M7 (×${booking.quantity_m7})` : 'Mindray M7');
+                    if (booking.quantity_mx3 > 0) titleParts.push(booking.quantity_mx3 > 1 ? `Mindray MX3 (×${booking.quantity_mx3})` : 'Mindray MX3');
+                    if (booking.include_printer) titleParts.push('+ Impresora');
+                    if (booking.include_cart) titleParts.push('+ Carrito');
 
                     const isMaintenance = booking.status === 'maintenance';
+                    const equipStr = titleParts.join(' · ') || 'Ecógrafo';
                     const title = isMaintenance 
-                        ? `[MANTENIMIENTO] ${titleParts.join(', ')}`
-                        : `${titleParts.join(', ')} - ${booking.client_name}`;
+                        ? `🔧 Mantenimiento — ${equipStr}`
+                        : `${equipStr} — ${booking.client_name || 'Cliente'}`;
 
                     // Color Logic based on Logistics Status
                     let bgColor = '#3b82f6'; // Default Blue
@@ -166,6 +213,9 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                     time: "Hora",
                     event: "Evento",
                     noEventsInRange: "No hay reservas en este rango."
+                }}
+                components={{
+                    event: CustomEventComponent
                 }}
                 eventPropGetter={eventStyleGetter}
             />

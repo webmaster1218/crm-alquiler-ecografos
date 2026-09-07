@@ -15,7 +15,8 @@ import {
   Filter,
   Eye,
   RefreshCw,
-  Plus
+  Plus,
+  RotateCcw
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabaseClient';
 import { getTotalStock } from '../../../lib/availability';
@@ -83,14 +84,53 @@ const EQUIPMENT_MODELS: EquipmentModel[] = [
   }
 ];
 
+// Helper functions for safe date formatting without timezone shifts
+const formatDateShort = (dateStr: string) => {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+};
+
+const formatDateFull = (dateStr: string) => {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  const formatted = date.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+};
+
+const addDaysToString = (dateStr: string, days: number): string => {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d + days);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function DispositivosPage() {
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
   const [selectedModel, setSelectedModel] = useState<'z6' | 'z60' | 'm7' | 'mx3'>('z6');
   const [stock, setStock] = useState({ z6: 2, z60: 2, m7: 1, mx3: 1 });
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Date selector for simulation & checking
-  const [targetDate, setTargetDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
+  const [targetDate, setTargetDate] = useState<string>(() => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
   const [durationDays, setDurationDays] = useState<number>(1);
 
   // Month navigation for Timeline view
@@ -144,9 +184,8 @@ export default function DispositivosPage() {
 
   // Current active rentals right now for this model
   const activeNow = useMemo(() => {
-    const todayStr = new Date().toISOString().split('T')[0];
     return modelBookings.filter(b => b.start_date <= todayStr && b.end_date >= todayStr);
-  }, [modelBookings]);
+  }, [modelBookings, todayStr]);
 
   const unitsInUseNow = useMemo(() => {
     return activeNow.reduce((sum, b) => sum + (b[`quantity_${selectedModel}`] || 0), 0);
@@ -155,24 +194,56 @@ export default function DispositivosPage() {
   const totalUnitsForModel = stock[selectedModel] || 1;
   const unitsAvailableNow = Math.max(0, totalUnitsForModel - unitsInUseNow);
 
-  // Availability on targeted simulation date
-  const targetedBookings = useMemo(() => {
-    if (!targetDate) return [];
-    
-    // Calculate end date of desired rental
-    const start = new Date(targetDate);
-    const end = new Date(start);
-    end.setDate(end.getDate() + (durationDays - 1));
-    const endStr = end.toISOString().split('T')[0];
+  const isSelectedToday = targetDate === todayStr && durationDays === 1;
 
-    return modelBookings.filter(b => b.start_date <= endStr && b.end_date >= targetDate);
-  }, [modelBookings, targetDate, durationDays]);
+  // Calculate availability for each model on the targeted date/range
+  const availabilityOnTarget = useMemo(() => {
+    const dateToCheck = targetDate || todayStr;
+    const endStr = addDaysToString(dateToCheck, Math.max(0, durationDays - 1));
 
-  const unitsBlockedOnTarget = useMemo(() => {
-    return targetedBookings.reduce((sum, b) => sum + (b[`quantity_${selectedModel}`] || 0), 0);
-  }, [targetedBookings, selectedModel]);
+    const result: Record<string, { total: number; inUse: number; free: number }> = {};
 
-  const unitsAvailableOnTarget = Math.max(0, totalUnitsForModel - unitsBlockedOnTarget);
+    EQUIPMENT_MODELS.forEach(model => {
+      const totalUnits = stock[model.id] || 0;
+      
+      // All bookings of this model overlapping with [dateToCheck, endStr]
+      const modelOverlaps = bookings.filter(b => {
+        const qty = b[`quantity_${model.id}`] || 0;
+        return qty > 0 && b.start_date <= endStr && b.end_date >= dateToCheck;
+      });
+
+      // Find the peak overlap day within the range
+      const [y, m, d] = dateToCheck.split('-').map(Number);
+      const [ey, em, ed] = endStr.split('-').map(Number);
+      const start = new Date(y, m - 1, d);
+      const end = new Date(ey, em - 1, ed);
+      
+      let maxInUse = 0;
+      for (let cur = new Date(start); cur <= end; cur.setDate(cur.getDate() + 1)) {
+        const curY = cur.getFullYear();
+        const curM = String(cur.getMonth() + 1).padStart(2, '0');
+        const curD = String(cur.getDate()).padStart(2, '0');
+        const curStr = `${curY}-${curM}-${curD}`;
+
+        const dayInUse = modelOverlaps
+          .filter(b => b.start_date <= curStr && b.end_date >= curStr)
+          .reduce((sum, b) => sum + (b[`quantity_${model.id}`] || 0), 0);
+        if (dayInUse > maxInUse) maxInUse = dayInUse;
+      }
+
+      result[model.id] = {
+        total: totalUnits,
+        inUse: maxInUse,
+        free: Math.max(0, totalUnits - maxInUse)
+      };
+    });
+
+    return result;
+  }, [stock, bookings, targetDate, durationDays, todayStr]);
+
+  const selectedModelAvail = availabilityOnTarget[selectedModel] || { total: totalUnitsForModel, inUse: 0, free: totalUnitsForModel };
+  const unitsBlockedOnTarget = selectedModelAvail.inUse;
+  const unitsAvailableOnTarget = selectedModelAvail.free;
 
   // Generate calendar days for the timeline of the current month
   const monthDays = useMemo(() => {
@@ -265,19 +336,43 @@ export default function DispositivosPage() {
         </div>
       </div>
 
-      {/* Selector de Modelos de Ecógrafos (Tabs con Cards) */}
+      {/* Barra de contexto de Fecha Activa para la Disponibilidad */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1 py-1">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-text-secondary font-medium">Disponibilidad de flota calculada para:</span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 font-bold text-xs shadow-xs">
+            <CalendarIcon size={13} />
+            {isSelectedToday ? `Hoy (${formatDateFull(todayStr)})` : formatDateFull(targetDate)}
+            {durationDays > 1 && ` · ${durationDays} días`}
+          </span>
+          {!isSelectedToday && (
+            <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-500/20 animate-in fade-in duration-200">
+              Día seleccionado del calendario
+            </span>
+          )}
+        </div>
+
+        {!isSelectedToday && (
+          <button
+            onClick={() => {
+              setTargetDate(todayStr);
+              setDurationDays(1);
+            }}
+            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer self-start sm:self-auto bg-blue-50 dark:bg-blue-950/40 px-3 py-1 rounded-lg border border-blue-200 dark:border-blue-900/50"
+          >
+            <RotateCcw size={12} />
+            Restablecer a hoy
+          </button>
+        )}
+      </div>
+
+      {/* Selector de Modelos de Ecógrafos (Tabs con Cards sincronizadas con la fecha seleccionada) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {EQUIPMENT_MODELS.map(model => {
           const isSelected = selectedModel === model.id;
-          const totalUnits = stock[model.id] || 0;
-          
-          // Contar unidades en uso hoy
-          const todayStr = new Date().toISOString().split('T')[0];
-          const inUseToday = bookings
-            .filter(b => (b[`quantity_${model.id}`] || 0) > 0 && b.start_date <= todayStr && b.end_date >= todayStr)
-            .reduce((sum, b) => sum + (b[`quantity_${model.id}`] || 0), 0);
-
-          const freeToday = Math.max(0, totalUnits - inUseToday);
+          const modelAvail = availabilityOnTarget[model.id] || { total: stock[model.id] || 0, inUse: 0, free: stock[model.id] || 0 };
+          const totalUnits = modelAvail.total;
+          const freeOnDate = modelAvail.free;
 
           return (
             <div
@@ -310,9 +405,17 @@ export default function DispositivosPage() {
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-text-muted block">Disponible Hoy</span>
-                  <span className={`text-sm font-black ${freeToday > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {freeToday} {freeToday === 1 ? 'libre' : 'libres'}
+                  <span className={`text-[10px] uppercase font-bold flex items-center gap-1 justify-end ${
+                    isSelectedToday ? 'text-text-muted' : 'text-blue-600 dark:text-blue-400 font-extrabold'
+                  }`}>
+                    {!isSelectedToday && <CalendarIcon size={11} className="shrink-0" />}
+                    {isSelectedToday 
+                      ? 'Disponible Hoy' 
+                      : `Disp. ${formatDateShort(targetDate)}${durationDays > 1 ? ` - ${formatDateShort(addDaysToString(targetDate, durationDays - 1))}` : ''}`
+                    }
+                  </span>
+                  <span className={`text-sm font-black ${freeOnDate > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    {freeOnDate} {freeOnDate === 1 ? 'libre' : 'libres'}
                   </span>
                 </div>
               </div>
@@ -413,7 +516,7 @@ export default function DispositivosPage() {
               Línea de Tiempo Mensual: {currentModelConfig.name}
             </h3>
             <p className="text-xs text-text-secondary">
-              Visualiza día por día cuántos ecógrafos de este modelo están en clínica y cuáles están en bodega.
+              Visualiza la ocupación diaria. Haz clic en cualquier día para actualizar la disponibilidad de toda la flota en esa fecha.
             </p>
           </div>
 
@@ -450,27 +553,38 @@ export default function DispositivosPage() {
         {/* Grid de días del mes */}
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
           {monthDays.map(day => {
-            const isToday = day.dateStr === new Date().toISOString().split('T')[0];
+            const isToday = day.dateStr === todayStr;
             const isSelectedTarget = day.dateStr === targetDate;
 
             return (
               <div
                 key={day.dateStr}
                 onClick={() => setTargetDate(day.dateStr)}
-                className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[90px] ${
+                className={`p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[90px] relative overflow-hidden ${
                   isSelectedTarget 
-                    ? 'ring-2 ring-brand border-brand bg-brand/5' 
+                    ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 shadow-sm scale-[1.02]' 
                     : day.isFullyBooked
-                      ? 'bg-rose-500/10 border-rose-500/20'
+                      ? 'bg-rose-500/10 border-rose-500/20 hover:border-rose-500/40'
                       : day.usedUnits > 0
-                        ? 'bg-amber-500/10 border-amber-500/20'
-                        : 'bg-slate-50 dark:bg-slate-950/60 border-slate-200/60 dark:border-slate-800/80 hover:border-slate-300'
+                        ? 'bg-amber-500/10 border-amber-500/20 hover:border-amber-500/40'
+                        : 'bg-slate-50 dark:bg-slate-950/60 border-slate-200/60 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-black ${isToday ? 'px-1.5 py-0.5 rounded bg-blue-600 text-white' : 'text-text-primary'}`}>
-                    {day.dayNumber}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-xs font-black ${
+                      isToday 
+                        ? 'px-1.5 py-0.5 rounded-md bg-blue-600 text-white' 
+                        : isSelectedTarget 
+                          ? 'text-blue-600 dark:text-blue-400 font-extrabold' 
+                          : 'text-text-primary'
+                    }`}>
+                      {day.dayNumber}
+                    </span>
+                    {isSelectedTarget && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    )}
+                  </div>
                   <span className={`text-[9px] font-bold uppercase ${
                     day.isFullyBooked 
                       ? 'text-rose-500' 
