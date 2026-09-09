@@ -1,12 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../../lib/supabaseClient';
 import { calculateDays, calculateTotalPrice } from '../../../../lib/pricing';
+import { AdminBookingSchema } from '../../../../lib/validations/alquileres';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const rawBody = await request.json().catch(() => null);
+    if (!rawBody) {
+      return NextResponse.json(
+        { error: 'Cuerpo de solicitud inválido o ausente.' },
+        { status: 400 }
+      );
+    }
+
+    // Validación defensiva con Zod
+    const parseResult = AdminBookingSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const errorMessages = parseResult.error.issues.map((e) => e.message);
+      return NextResponse.json(
+        {
+          error: 'Datos de la reserva inválidos.',
+          details: errorMessages,
+        },
+        { status: 400 }
+      );
+    }
 
     const {
       client_name,
@@ -26,14 +46,7 @@ export async function POST(request: NextRequest) {
       selected_transducers = [],
       status = 'pending_confirmation',
       notes = ''
-    } = body;
-
-    if (!client_name || !start_date || !end_date) {
-      return NextResponse.json(
-        { error: 'Faltan parámetros requeridos: client_name, start_date y end_date' },
-        { status: 400 }
-      );
-    }
+    } = parseResult.data;
 
     // Calculate duration & price if not explicitly supplied
     const days = calculateDays(start_date, end_date);
@@ -66,7 +79,7 @@ export async function POST(request: NextRequest) {
       selected_transducers,
       status,
       notes,
-      total_price: body.total_price ? Number(body.total_price) : calculatedPrice
+      total_price: parseResult.data.total_price ? Number(parseResult.data.total_price) : calculatedPrice
     };
 
     const { data, error } = await supabase
