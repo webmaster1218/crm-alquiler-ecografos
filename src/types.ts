@@ -76,6 +76,7 @@ export interface Conversation {
   assignedTo: string;
   messages: Message[];
   priority?: 'Baja' | 'Media' | 'Alta';
+  ia_activa?: boolean;
 }
 
 export type TaskPriority = 'Baja' | 'Media' | 'Alta';

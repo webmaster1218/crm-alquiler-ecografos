@@ -548,7 +548,17 @@ export function ChatInbox() {
                       {channelIcons[conv.channel]}
                       {channelLabels[conv.channel]}
                     </span>
-                    <span className="text-[9px] font-semibold text-slate-400">1h</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                        conv.ia_activa !== false
+                          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                          : 'bg-slate-150 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${conv.ia_activa !== false ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
+                        {conv.ia_activa !== false ? 'IA Activa' : 'IA Detenida'}
+                      </span>
+                      <span className="text-[9px] font-semibold text-slate-400">1h</span>
+                    </div>
                   </div>
 
                   <div className="flex gap-3">
@@ -645,6 +655,25 @@ export function ChatInbox() {
                  >
                    <Info size={16}/>
                  </button>
+
+                  <button
+                    onClick={() => {
+                      const updatedConv: Conversation = {
+                        ...selectedConv,
+                        ia_activa: selectedConv.ia_activa === false ? true : false
+                      };
+                      dispatch({ type: 'UPDATE_CONVERSATION', payload: updatedConv });
+                    }}
+                    title={selectedConv.ia_activa === false ? "Activar Agente IA" : "Pausar Agente IA (Atención Humana)"}
+                    className={`h-9 px-3 rounded-xl flex items-center gap-1.5 text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm cursor-pointer ${
+                      selectedConv.ia_activa === false
+                        ? 'bg-amber-500/10 text-amber-600 border border-amber-500/30 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-400'
+                        : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-400'
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${selectedConv.ia_activa === false ? 'bg-amber-500' : 'bg-emerald-500 animate-pulse'}`}></span>
+                    <span>{selectedConv.ia_activa === false ? 'IA Pausada' : 'IA Activa'}</span>
+                  </button>
 
                  <button 
                    onClick={handleToggleStatus}
