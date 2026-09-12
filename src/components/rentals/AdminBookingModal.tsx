@@ -301,7 +301,16 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                     notes: formData.notes,
                     total_price: getTotalPrice()
                 };
-                const { error } = await supabase.from('bookings').insert([payload]);
+                let { error } = await supabase.from('bookings').insert([payload]);
+                if (error && (error.message?.includes('quantity_mx3') || error.code === 'PGRST204')) {
+                    const fallbackPayload = { ...payload };
+                    delete (fallbackPayload as any).quantity_mx3;
+                    if (formData.quantityMx3 > 0) {
+                        fallbackPayload.notes = (fallbackPayload.notes ? fallbackPayload.notes + ' | ' : '') + `MX3: ${formData.quantityMx3}`;
+                    }
+                    const res = await supabase.from('bookings').insert([fallbackPayload]);
+                    error = res.error;
+                }
                 if (error) throw error;
             }
             onSuccess();

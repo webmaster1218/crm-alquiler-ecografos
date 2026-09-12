@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../../lib/supabaseClient';
 import { calculateDays, calculateTotalPrice } from '../../../../lib/pricing';
 import { AdminBookingSchema } from '../../../../lib/validations/alquileres';
+import {
+  getAlertsConfig,
+  formatAlertMessage,
+  sendEvolutionTextMessage,
+  normalizePhoneNumber
+} from '../../../../lib/rentalAlerts';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,14 +88,73 @@ export async function POST(request: NextRequest) {
       total_price: parseResult.data.total_price ? Number(parseResult.data.total_price) : calculatedPrice
     };
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('bookings')
       .insert([payload])
       .select();
 
+    if (error && (error.message?.includes('quantity_mx3') || error.code === 'PGRST204')) {
+      const fallbackPayload = { ...payload };
+      delete (fallbackPayload as any).quantity_mx3;
+      if (Number(quantity_mx3) > 0) {
+        fallbackPayload.notes = (fallbackPayload.notes ? fallbackPayload.notes + ' | ' : '') + `MX3: ${quantity_mx3}`;
+      }
+      const res = await supabase.from('bookings').insert([fallbackPayload]).select();
+      data = res.data;
+      error = res.error;
+    }
+
     if (error) {
       throw error;
     }
+
+    // Disparar alertas de WhatsApp de forma asíncrona si están habilitadas
+    (async () => {
+      try {
+        const config = await getAlertsConfig(supabase);
+        if (config.enabled && config.phoneNumbers?.length > 0) {
+          const summary = [];
+          if (payload.quantity_z6 > 0) summary.push(`ECOGRAFO Z6 (${payload.quantity_z6})`);
+          if (payload.quantity_z60 > 0) summary.push(`ECOGRAFO Z60 (${payload.quantity_z60})`);
+          if (payload.quantity_m7 > 0) summary.push(`ECOGRAFO M7 (${payload.quantity_m7})`);
+          if (Number(quantity_mx3) > 0) summary.push(`ECOGRAFO MX3 (${quantity_mx3})`);
+          if (payload.include_cart) summary.push('CARRITO');
+          if (payload.include_printer) summary.push('IMPRESORA');
+
+          const messageText = formatAlertMessage(config.messageTemplate, {
+            client_name: payload.client_name,
+            client_email: payload.client_email,
+            client_phone: payload.client_phone,
+            client_type: 'Admin CRM',
+            document_number: payload.document_number,
+            tax_id: payload.tax_id,
+            full_address: payload.client_address,
+            start_date: payload.start_date,
+            end_date: payload.end_date,
+            delivery_time: 'A convenir',
+            collection_time: 'A convenir',
+            total_days: days,
+            equipment_summary: summary.join('\n') || 'Alquiler administrativo',
+            total_price: payload.total_price,
+          });
+
+          for (const rawNumber of config.phoneNumbers) {
+            const cleanNumber = normalizePhoneNumber(rawNumber);
+            if (cleanNumber) {
+              await sendEvolutionTextMessage({
+                apiUrl: config.apiUrl,
+                apiKey: config.apiKey,
+                instanceName: config.instanceName,
+                number: cleanNumber,
+                text: messageText,
+              });
+            }
+          }
+        }
+      } catch (alertErr) {
+        console.error('Error sending whatsapp alert from admin reserve:', alertErr);
+      }
+    })();
 
     return NextResponse.json({
       success: true,
