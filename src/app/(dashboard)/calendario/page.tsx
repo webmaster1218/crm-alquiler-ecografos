@@ -20,13 +20,59 @@ export default function CalendarioPage() {
   const [initialRange, setInitialRange] = useState<{ start: string; end: string } | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleEditBooking = (booking: any) => {
-    if (booking?.id) {
-      setViewingBookingId(booking.id);
+  const handleEditBooking = async (item: any) => {
+    if (item?.isBlock) {
+      const equipNames = [];
+      if (item.quantity_z6 > 0) equipNames.push(`${item.quantity_z6}x Mindray Z6`);
+      if (item.quantity_z60 > 0) equipNames.push(`${item.quantity_z60}x Mindray Z60`);
+      if (item.quantity_m7 > 0) equipNames.push(`${item.quantity_m7}x Mindray M7`);
+      if (item.quantity_mx3 > 0) equipNames.push(`${item.quantity_mx3}x Mindray MX3`);
+
+      const res = await Swal.fire({
+        title: '🔧 ' + (item.tipo === 'mantenimiento' ? 'Mantenimiento Técnico' : 'Bloqueo Administrativo'),
+        html: `
+          <div style="text-align: left; font-size: 13px; line-height: 1.6; padding: 4px 8px;">
+            <p><strong>Equipos:</strong> ${equipNames.join(', ') || 'Flota general'}</p>
+            <p><strong>Período:</strong> ${item.start_date} al ${item.end_date}</p>
+            <p><strong>Motivo:</strong> ${item.motivo || 'Sin observaciones'}</p>
+            <p><strong>Responsable:</strong> ${item.responsable || 'Administrador'}</p>
+          </div>
+        `,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'Cerrar',
+        confirmButtonColor: '#3b82f6',
+        denyButtonText: '🗑️ Liberar / Desbloquear',
+        denyButtonColor: '#ef4444',
+      });
+
+      if (res.isDenied) {
+        const confirmDelete = await Swal.fire({
+          title: '¿Liberar ecógrafo?',
+          text: 'El equipo volverá a estar disponible para reservas en estas fechas.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, liberar',
+          confirmButtonColor: '#ef4444',
+          cancelButtonText: 'Cancelar'
+        });
+
+        if (confirmDelete.isConfirmed) {
+          const { error } = await supabase.from('bloqueos_equipos').delete().eq('id', item.id);
+          if (error) {
+            Swal.fire('Error', 'No se pudo eliminar el bloqueo: ' + error.message, 'error');
+          } else {
+            Swal.fire('Liberado', 'El equipo ha sido desbloqueado correctamente.', 'success');
+            setRefreshKey(prev => prev + 1);
+          }
+        }
+      }
+    } else if (item?.id) {
+      setViewingBookingId(item.id);
     } else {
-      setSelectedBooking(booking);
+      setSelectedBooking(item);
       setInitialRange(null);
-      setIsBlockingMode(booking?.status === 'maintenance');
+      setIsBlockingMode(false);
       setShowModal(true);
     }
   };

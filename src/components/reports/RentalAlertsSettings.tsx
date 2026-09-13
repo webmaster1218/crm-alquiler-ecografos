@@ -40,9 +40,71 @@ export default function RentalAlertsSettings() {
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [instanceStatus, setInstanceStatus] = useState<'checking' | 'open' | 'close' | 'unknown'>('checking');
 
-  // Cargar configuración existente desde la base de datos
+  // Guardar configuración de forma inmediata y robusta (API + Supabase + LocalStorage)
+  const persistConfig = async (newConfig: RentalAlertsConfig, feedbackMessage?: string) => {
+    setConfig(newConfig);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('rental_alerts_config', JSON.stringify(newConfig));
+      } catch (e) {
+        // Silencioso
+      }
+    }
+
+    setSaving(true);
+    try {
+      // 1. Guardar a través de la API
+      const res = await fetch('/api/alquileres/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newConfig),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (data?.success && data?.config) {
+        setConfig(data.config);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3500);
+      } else {
+        // Fallback directo a Supabase
+        const dbRes = await saveAlertsConfig(supabase, newConfig);
+        if (dbRes.success) {
+          setSaveSuccess(true);
+          setTimeout(() => setSaveSuccess(false), 3500);
+        } else {
+          console.warn('Fallo persistiendo en BD:', dbRes.error);
+        }
+      }
+    } catch (err) {
+      // Fallback directo a Supabase en caso de error de fetch
+      try {
+        await saveAlertsConfig(supabase, newConfig);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3500);
+      } catch (innerErr) {
+        console.error('Error guardando configuración:', innerErr);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Cargar configuración existente desde la base de datos y cache local
   useEffect(() => {
     async function loadConfig() {
+      // 1. Cargar caché inmediata para cero parpadeo
+      if (typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem('rental_alerts_config');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed && Array.isArray(parsed.phoneNumbers)) {
+              setConfig(parsed);
+            }
+          }
+        } catch (e) {}
+      }
+
       setLoading(true);
       try {
         const res = await fetch('/api/alquileres/config');
@@ -50,6 +112,9 @@ export default function RentalAlertsSettings() {
           const data = await res.json();
           if (data.success && data.config) {
             setConfig(data.config);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('rental_alerts_config', JSON.stringify(data.config));
+            }
             checkInstanceHealth(data.config.apiUrl, data.config.apiKey, data.config.instanceName);
             return;
           }
@@ -57,6 +122,9 @@ export default function RentalAlertsSettings() {
         // Fallback directo a Supabase
         const loaded = await getAlertsConfig(supabase);
         setConfig(loaded);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rental_alerts_config', JSON.stringify(loaded));
+        }
         checkInstanceHealth(loaded.apiUrl, loaded.apiKey, loaded.instanceName);
       } catch (err) {
         console.error('Error cargando configuración:', err);
@@ -93,7 +161,7 @@ export default function RentalAlertsSettings() {
     }
   };
 
-  const handleAddPhone = () => {
+  const handleAddPhone = async () => {
     setPhoneError('');
     const clean = newPhone.trim();
     if (!clean) {
@@ -114,18 +182,33 @@ export default function RentalAlertsSettings() {
       return;
     }
 
-    setConfig(prev => ({
-      ...prev,
-      phoneNumbers: [...prev.phoneNumbers, formatted]
-    }));
+    const updatedNumbers = [...config.phoneNumbers, formatted];
     setNewPhone('');
+    
+    // Auto-guardado instantáneo en la base de datos
+    await persistConfig({
+      ...config,
+      phoneNumbers: updatedNumbers,
+    });
   };
 
-  const handleRemovePhone = (indexToRemove: number) => {
-    setConfig(prev => ({
-      ...prev,
-      phoneNumbers: prev.phoneNumbers.filter((_, idx) => idx !== indexToRemove)
-    }));
+  const handleRemovePhone = async (indexToRemove: number) => {
+    const updatedNumbers = config.phoneNumbers.filter((_, idx) => idx !== indexToRemove);
+    
+    // Auto-guardado instantáneo en la base de datos
+    await persistConfig({
+      ...config,
+      phoneNumbers: updatedNumbers,
+    });
+  };
+
+  const handleClearAllPhones = async () => {
+    if (confirm('¿Estás seguro de que deseas eliminar TODOS los números destinatarios?')) {
+      await persistConfig({
+        ...config,
+        phoneNumbers: [],
+      });
+    }
   };
 
   const handleInsertVariable = (variableTag: string) => {
@@ -137,18 +220,15 @@ export default function RentalAlertsSettings() {
 
   const handleResetTemplate = () => {
     if (confirm('¿Deseas restablecer la plantilla al formato predeterminado?')) {
-      setConfig(prev => ({
-        ...prev,
+      const resetConfig = {
+        ...config,
         messageTemplate: DEFAULT_ALERT_TEMPLATE
-      }));
+      };
+      persistConfig(resetConfig);
     }
   };
 
   const handleSave = async () => {
-    setSaving(true);
-    setSaveSuccess(false);
-    setTestResult(null);
-
     // Si el usuario escribió un número en el input y no presionó "Agregar", incluirlo automáticamente
     let phonesToSave = [...config.phoneNumbers];
     const pending = newPhone.trim();
@@ -168,36 +248,7 @@ export default function RentalAlertsSettings() {
       phoneNumbers: phonesToSave,
     };
 
-    try {
-      // 1. Guardar a través del endpoint API del servidor
-      const res = await fetch('/api/alquileres/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(configToSave),
-      });
-
-      const data = await res.json();
-
-      if (data.success && data.config) {
-        setConfig(data.config);
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 4500);
-      } else {
-        // Fallback guardado directo en Supabase
-        const fallbackRes = await saveAlertsConfig(supabase, configToSave);
-        if (fallbackRes.success) {
-          setConfig(configToSave);
-          setSaveSuccess(true);
-          setTimeout(() => setSaveSuccess(false), 4500);
-        } else {
-          alert(`Error al guardar: ${data.error || fallbackRes.error}`);
-        }
-      }
-    } catch (err: any) {
-      alert(`Error inesperado: ${err.message}`);
-    } finally {
-      setSaving(false);
-    }
+    await persistConfig(configToSave);
   };
 
   const handleSendTest = async () => {
@@ -385,9 +436,20 @@ export default function RentalAlertsSettings() {
               <h3 className="text-xs font-black text-text-primary uppercase tracking-wider flex items-center gap-2">
                 <Smartphone className="text-brand" size={16} /> Destinatarios del Reporte
               </h3>
-              <span className="text-[11px] font-bold text-text-secondary">
-                {config.phoneNumbers.length} número(s)
-              </span>
+              <div className="flex items-center gap-2">
+                {config.phoneNumbers.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearAllPhones}
+                    className="text-[10px] font-bold text-rose-500 hover:text-rose-600 hover:underline transition-colors"
+                  >
+                    Eliminar todos
+                  </button>
+                )}
+                <span className="text-[11px] font-bold text-text-secondary">
+                  {config.phoneNumbers.length} número(s)
+                </span>
+              </div>
             </div>
 
             <p className="text-xs text-text-secondary">

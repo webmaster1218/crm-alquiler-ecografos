@@ -96,8 +96,10 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                 return;
             }
 
+            let mappedEvents: CalendarEvent[] = [];
+
             if (data) {
-                const mappedEvents: CalendarEvent[] = data.map(booking => {
+                mappedEvents = data.map(booking => {
                     let titleParts = [];
                     if (booking.quantity_z6 > 0) titleParts.push(booking.quantity_z6 > 1 ? `Mindray Z6 (×${booking.quantity_z6})` : 'Mindray Z6');
                     if (booking.quantity_z60 > 0) titleParts.push(booking.quantity_z60 > 1 ? `Mindray Z60 (×${booking.quantity_z60})` : 'Mindray Z60');
@@ -106,11 +108,8 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                     if (booking.include_printer) titleParts.push('+ Impresora');
                     if (booking.include_cart) titleParts.push('+ Carrito');
 
-                    const isMaintenance = booking.status === 'maintenance';
                     const equipStr = titleParts.join(' · ') || 'Ecógrafo';
-                    const title = isMaintenance 
-                        ? `🔧 Mantenimiento — ${equipStr}`
-                        : `${equipStr} — ${booking.client_name || 'Cliente'}`;
+                    const title = `${equipStr} — ${booking.client_name || 'Cliente'}`;
 
                     // Color Logic based on Logistics Status
                     let bgColor = '#3b82f6'; // Default Blue
@@ -131,15 +130,11 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                         case 'completed':
                             bgColor = '#64748b'; // Slate 500 (Gray)
                             break;
-                        case 'maintenance':
-                            bgColor = '#1e293b'; // Slate 800 (Very Dark / Black)
-                            break;
                     }
 
                     // Create start date at 00:00:00 and end date at 23:59:59 using string components to avoid UTC offset issues
                     const [sY, sM, sD] = (booking.start_date || '').split('-').map(Number);
                     const [eY, eM, eD] = (booking.end_date || '').split('-').map(Number);
-
 
                     const start = (sY && sM && sD) ? new Date(sY, sM - 1, sD, 0, 0, 0) : new Date();
                     const end = (eY && eM && eD) ? new Date(eY, eM - 1, eD, 23, 59, 59) : start;
@@ -154,8 +149,48 @@ export function BookingsCalendar({ onEditBooking, onCreateBooking }: BookingsCal
                         style: { backgroundColor: bgColor }
                     };
                 });
-                setEvents(mappedEvents);
             }
+
+            // Fetch technical blocks from bloqueos_equipos
+            let blockEvents: CalendarEvent[] = [];
+            try {
+                const { data: blocks, error: blockErr } = await supabase
+                    .from('bloqueos_equipos')
+                    .select('*');
+
+                if (!blockErr && blocks && blocks.length > 0) {
+                    blockEvents = blocks.map(block => {
+                        let titleParts = [];
+                        if (block.quantity_z6 > 0) titleParts.push(block.quantity_z6 > 1 ? `Z6 (×${block.quantity_z6})` : 'Z6');
+                        if (block.quantity_z60 > 0) titleParts.push(block.quantity_z60 > 1 ? `Z60 (×${block.quantity_z60})` : 'Z60');
+                        if (block.quantity_m7 > 0) titleParts.push(block.quantity_m7 > 1 ? `M7 (×${block.quantity_m7})` : 'M7');
+                        if (block.quantity_mx3 > 0) titleParts.push(block.quantity_mx3 > 1 ? `MX3 (×${block.quantity_mx3})` : 'MX3');
+
+                        const equipStr = titleParts.join(' · ') || 'Flota';
+                        const label = block.tipo === 'mantenimiento' ? 'Mantenimiento' : 'Bloqueo';
+                        const title = `🔧 ${label}: ${equipStr}${block.motivo ? ` — ${block.motivo}` : ''}`;
+
+                        const [sY, sM, sD] = (block.start_date || '').split('-').map(Number);
+                        const [eY, eM, eD] = (block.end_date || '').split('-').map(Number);
+                        const start = (sY && sM && sD) ? new Date(sY, sM - 1, sD, 0, 0, 0) : new Date();
+                        const end = (eY && eM && eD) ? new Date(eY, eM - 1, eD, 23, 59, 59) : start;
+
+                        return {
+                            id: `block-${block.id}`,
+                            title: title,
+                            start: start,
+                            end: end,
+                            allDay: true,
+                            resource: { ...block, isBlock: true, status: 'maintenance' },
+                            style: { backgroundColor: '#1e293b' }
+                        };
+                    });
+                }
+            } catch {
+                // Table might not exist yet
+            }
+
+            setEvents([...mappedEvents, ...blockEvents]);
 
         } catch (err) {
             console.error('Error in fetchBookings:', err);

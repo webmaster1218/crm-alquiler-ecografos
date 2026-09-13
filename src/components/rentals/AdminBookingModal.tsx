@@ -214,58 +214,58 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                 const { error } = await supabase.from('bookings').update(payload).eq('id', bookingToEdit.id);
                 if (error) throw error;
             } else if (isBlockingMode) {
-                // MASSIVE BLOCKING: Create one record per model if quantity > 0
+                // MASSIVE BLOCKING: Create records in 'bloqueos_equipos' table
                 const blocks = [];
                 if (formData.quantityZ6 > 0) {
                     blocks.push({
-                        client_name: "BLOQUEO Z6",
-                        status: 'maintenance',
+                        tipo: 'mantenimiento',
                         quantity_z6: formData.quantityZ6,
                         quantity_z60: 0,
                         quantity_m7: 0,
                         quantity_mx3: 0,
                         start_date: formData.z6StartDate || formData.startDate,
                         end_date: formData.z6EndDate || formData.endDate,
-                        notes: `Bloqueo masivo: ${formData.notes}`.trim()
+                        motivo: formData.notes ? `Bloqueo Z6: ${formData.notes}` : 'Mantenimiento / Bloqueo Z6',
+                        responsable: 'Administrador'
                     });
                 }
                 if (formData.quantityZ60 > 0) {
                     blocks.push({
-                        client_name: "BLOQUEO Z60",
-                        status: 'maintenance',
+                        tipo: 'mantenimiento',
                         quantity_z6: 0,
                         quantity_z60: formData.quantityZ60,
                         quantity_m7: 0,
                         quantity_mx3: 0,
                         start_date: formData.z60StartDate || formData.startDate,
                         end_date: formData.z60EndDate || formData.endDate,
-                        notes: `Bloqueo masivo: ${formData.notes}`.trim()
+                        motivo: formData.notes ? `Bloqueo Z60: ${formData.notes}` : 'Mantenimiento / Bloqueo Z60',
+                        responsable: 'Administrador'
                     });
                 }
                 if (formData.quantityM7 > 0) {
                     blocks.push({
-                        client_name: "BLOQUEO M7",
-                        status: 'maintenance',
+                        tipo: 'mantenimiento',
                         quantity_z6: 0,
                         quantity_z60: 0,
                         quantity_m7: formData.quantityM7,
                         quantity_mx3: 0,
                         start_date: formData.m7StartDate || formData.startDate,
                         end_date: formData.m7EndDate || formData.endDate,
-                        notes: `Bloqueo masivo: ${formData.notes}`.trim()
+                        motivo: formData.notes ? `Bloqueo M7: ${formData.notes}` : 'Mantenimiento / Bloqueo M7',
+                        responsable: 'Administrador'
                     });
                 }
                 if (formData.quantityMx3 > 0) {
                     blocks.push({
-                        client_name: "BLOQUEO MX3",
-                        status: 'maintenance',
+                        tipo: 'mantenimiento',
                         quantity_z6: 0,
                         quantity_z60: 0,
                         quantity_m7: 0,
                         quantity_mx3: formData.quantityMx3,
                         start_date: formData.mx3StartDate || formData.startDate,
                         end_date: formData.mx3EndDate || formData.endDate,
-                        notes: `Bloqueo masivo: ${formData.notes}`.trim()
+                        motivo: formData.notes ? `Bloqueo MX3: ${formData.notes}` : 'Mantenimiento / Bloqueo MX3',
+                        responsable: 'Administrador'
                     });
                 }
 
@@ -275,8 +275,11 @@ export function AdminBookingModal({ isOpen, onClose, onSuccess, bookingToEdit, i
                     return;
                 }
 
-                const { error } = await supabase.from('bookings').insert(blocks);
-                if (error) throw error;
+                const { error } = await supabase.from('bloqueos_equipos').insert(blocks);
+                if (error) {
+                    console.error('Error insertando en bloqueos_equipos:', error);
+                    throw new Error(`No se pudo registrar el bloqueo en bloqueos_equipos: ${error.message}. Asegúrate de haber ejecutado CREAR_TABLA_BLOQUEOS.sql en Supabase.`);
+                }
             } else {
                 const payload = {
                     client_name: formData.clientName,

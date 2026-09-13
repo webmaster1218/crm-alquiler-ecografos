@@ -99,7 +99,7 @@ export async function getAlertsConfig(supabaseClient: SupabaseClient): Promise<R
     return {
       ...DEFAULT_ALERT_CONFIG,
       ...data.value,
-      phoneNumbers: Array.isArray(data.value.phoneNumbers) && data.value.phoneNumbers.length > 0
+      phoneNumbers: Array.isArray(data.value.phoneNumbers)
         ? data.value.phoneNumbers
         : DEFAULT_ALERT_CONFIG.phoneNumbers,
     };

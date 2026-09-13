@@ -121,8 +121,28 @@ export async function checkAvailability(startDate?: string, endDate?: string, ex
                 blockedZ6 += (booking.quantity_z6 || 0);
                 blockedZ60 += (booking.quantity_z60 || 0);
                 blockedM7 += (booking.quantity_m7 || 0);
-                // quantity_mx3 is not in database, so it's always 0
+                // quantity_mx3 is not in bookings table, so it's always 0
             });
+        }
+
+        // Query dedicated equipment blocks & maintenance table
+        try {
+            const { data: blocks, error: blocksErr } = await supabase
+                .from('bloqueos_equipos')
+                .select('quantity_z6, quantity_z60, quantity_m7, quantity_mx3')
+                .lte('start_date', endDate)
+                .gte('end_date', startDate);
+
+            if (!blocksErr && blocks && blocks.length > 0) {
+                blocks.forEach(b => {
+                    blockedZ6 += (b.quantity_z6 || 0);
+                    blockedZ60 += (b.quantity_z60 || 0);
+                    blockedM7 += (b.quantity_m7 || 0);
+                    blockedMx3 += (b.quantity_mx3 || 0);
+                });
+            }
+        } catch {
+            // Graceful fallback if bloqueos_equipos table does not exist yet
         }
 
         // Calculate available stock
@@ -177,6 +197,19 @@ export async function getNextAvailableDate(model: 'z6' | 'z60' | 'm7' | 'mx3', d
             .lte('start_date', maxDate.toISOString())
             .gte('end_date', checkDate.toISOString());
 
+        // Fetch equipment blocks in the same range
+        let blocksData: any[] = [];
+        try {
+            const { data: blocks } = await supabase
+                .from('bloqueos_equipos')
+                .select(`start_date, end_date, quantity_${model}`)
+                .lte('start_date', maxDate.toISOString())
+                .gte('end_date', checkDate.toISOString());
+            if (blocks) blocksData = blocks;
+        } catch {
+            // Table might not exist yet
+        }
+
         const activeBookings = bookings || [];
         const stock = totalStock[model];
 
@@ -190,6 +223,11 @@ export async function getNextAvailableDate(model: 'z6' | 'z60' | 'm7' | 'mx3', d
 
                 let usage = 0;
                 activeBookings.forEach(b => {
+                    if (b.start_date <= dateStr && b.end_date >= dateStr) {
+                        usage += (b[`quantity_${model}` as keyof typeof b] as number) || 0;
+                    }
+                });
+                blocksData.forEach(b => {
                     if (b.start_date <= dateStr && b.end_date >= dateStr) {
                         usage += (b[`quantity_${model}` as keyof typeof b] as number) || 0;
                     }
