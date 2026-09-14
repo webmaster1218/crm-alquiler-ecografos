@@ -29,18 +29,18 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('equipment_settings')
-        .select('value')
-        .eq('key', 'inventory')
+        .from('configuracion_equipos')
+        .select('valor')
+        .eq('clave', 'inventory')
         .single();
 
       if (error) throw error;
-      if (data && data.value) {
+      if (data && data.valor) {
         setStock({
-          z6: Number(data.value.z6) || 0,
-          z60: Number(data.value.z60) || 0,
-          m7: Number(data.value.m7) || 0,
-          mx3: Number(data.value.mx3) || 0
+          z6: Number(data.valor.z6) || 0,
+          z60: Number(data.valor.z60) || 0,
+          m7: Number(data.valor.m7) || 0,
+          mx3: Number(data.valor.mx3) || 0
         });
       }
     } catch (err) {
@@ -138,16 +138,17 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('equipment_settings')
+        .from('configuracion_equipos')
         .upsert({
-          key: 'inventory',
-          value: {
+          clave: 'inventory',
+          valor: {
             z6: Number(stock.z6),
             z60: Number(stock.z60),
             m7: Number(stock.m7),
             mx3: Number(stock.mx3)
-          }
-        }, { onConflict: 'key' });
+          },
+          actualizado_en: new Date().toISOString()
+        }, { onConflict: 'clave' });
 
       if (error) throw error;
 

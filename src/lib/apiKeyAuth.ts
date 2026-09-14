@@ -36,16 +36,16 @@ export async function validateApiKey(req: Request): Promise<{ valid: boolean; ke
     }
 
     const { data, error } = await supabase
-      .from('equipment_settings')
-      .select('value')
-      .eq('key', 'api_keys')
+      .from('configuracion_equipos')
+      .select('valor')
+      .eq('clave', 'api_keys')
       .single();
 
     if (error && error.code !== 'PGRST116') {
       console.error('[API Key Auth] Error al consultar API keys:', error);
     }
 
-    const keys: ApiKeyRecord[] = Array.isArray(data?.value) ? data.value : [];
+    const keys: ApiKeyRecord[] = Array.isArray(data?.valor) ? data.valor : [];
     const matchedKey = keys.find(k => k.active && k.key === token);
 
     if (matchedKey) {

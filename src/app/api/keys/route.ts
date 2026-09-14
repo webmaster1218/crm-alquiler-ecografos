@@ -12,9 +12,9 @@ export async function GET() {
     }
 
     const { data, error } = await supabase
-      .from('equipment_settings')
-      .select('value')
-      .eq('key', 'api_keys')
+      .from('configuracion_equipos')
+      .select('valor')
+      .eq('clave', 'api_keys')
       .single();
 
     if (error && error.code !== 'PGRST116') {
@@ -22,7 +22,7 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const keys: ApiKeyRecord[] = Array.isArray(data?.value) ? data.value : [];
+    const keys: ApiKeyRecord[] = Array.isArray(data?.valor) ? data.valor : [];
     return NextResponse.json({ keys });
   } catch (err: any) {
     console.error('Unexpected error in GET /api/keys:', err);
@@ -57,20 +57,21 @@ export async function POST(req: NextRequest) {
 
     // Obtener las claves existentes
     const { data } = await supabase
-      .from('equipment_settings')
-      .select('value')
-      .eq('key', 'api_keys')
+      .from('configuracion_equipos')
+      .select('valor')
+      .eq('clave', 'api_keys')
       .single();
 
-    const existingKeys: ApiKeyRecord[] = Array.isArray(data?.value) ? data.value : [];
+    const existingKeys: ApiKeyRecord[] = Array.isArray(data?.valor) ? data.valor : [];
     const updatedKeys = [newRecord, ...existingKeys];
 
     const { error: upsertError } = await supabase
-      .from('equipment_settings')
+      .from('configuracion_equipos')
       .upsert({
-        key: 'api_keys',
-        value: updatedKeys
-      }, { onConflict: 'key' });
+        clave: 'api_keys',
+        valor: updatedKeys,
+        actualizado_en: new Date().toISOString()
+      }, { onConflict: 'clave' });
 
     if (upsertError) {
       console.error('Error saving new API key:', upsertError);
@@ -101,20 +102,21 @@ export async function DELETE(req: NextRequest) {
     }
 
     const { data } = await supabase
-      .from('equipment_settings')
-      .select('value')
-      .eq('key', 'api_keys')
+      .from('configuracion_equipos')
+      .select('valor')
+      .eq('clave', 'api_keys')
       .single();
 
-    const existingKeys: ApiKeyRecord[] = Array.isArray(data?.value) ? data.value : [];
+    const existingKeys: ApiKeyRecord[] = Array.isArray(data?.valor) ? data.valor : [];
     const updatedKeys = existingKeys.filter(k => k.id !== id);
 
     const { error: upsertError } = await supabase
-      .from('equipment_settings')
+      .from('configuracion_equipos')
       .upsert({
-        key: 'api_keys',
-        value: updatedKeys
-      }, { onConflict: 'key' });
+        clave: 'api_keys',
+        valor: updatedKeys,
+        actualizado_en: new Date().toISOString()
+      }, { onConflict: 'clave' });
 
     if (upsertError) {
       console.error('Error deleting API key:', upsertError);

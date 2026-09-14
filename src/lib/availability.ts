@@ -24,21 +24,21 @@ export async function getTotalStock(): Promise<{ z6: number; z60: number; m7: nu
         if (!supabase) return DEFAULT_STOCK;
 
         const { data, error } = await supabase
-            .from('equipment_settings')
-            .select('value')
-            .eq('key', 'inventory')
+            .from('configuracion_equipos')
+            .select('valor')
+            .eq('clave', 'inventory')
             .single();
 
-        if (error || !data || !data.value) {
+        if (error || !data || !data.valor) {
             console.warn('Inventory setting not found, using default stock');
             return DEFAULT_STOCK;
         }
 
         return {
-            z6: typeof data.value.z6 === 'number' ? data.value.z6 : DEFAULT_STOCK.z6,
-            z60: typeof data.value.z60 === 'number' ? data.value.z60 : DEFAULT_STOCK.z60,
-            m7: typeof data.value.m7 === 'number' ? data.value.m7 : DEFAULT_STOCK.m7,
-            mx3: typeof data.value.mx3 === 'number' ? data.value.mx3 : DEFAULT_STOCK.mx3
+            z6: typeof data.valor.z6 === 'number' ? data.valor.z6 : DEFAULT_STOCK.z6,
+            z60: typeof data.valor.z60 === 'number' ? data.valor.z60 : DEFAULT_STOCK.z60,
+            m7: typeof data.valor.m7 === 'number' ? data.valor.m7 : DEFAULT_STOCK.m7,
+            mx3: typeof data.valor.mx3 === 'number' ? data.valor.mx3 : DEFAULT_STOCK.mx3
         };
     } catch (err) {
         console.error('Error fetching total stock:', err);

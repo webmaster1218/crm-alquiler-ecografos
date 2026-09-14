@@ -87,20 +87,20 @@ export const SETTINGS_KEY = 'rental_alerts_config';
 export async function getAlertsConfig(supabaseClient: SupabaseClient): Promise<RentalAlertsConfig> {
   try {
     const { data, error } = await supabaseClient
-      .from('equipment_settings')
-      .select('value')
-      .eq('key', SETTINGS_KEY)
+      .from('configuracion_equipos')
+      .select('valor')
+      .eq('clave', SETTINGS_KEY)
       .maybeSingle();
 
-    if (error || !data?.value) {
+    if (error || !data?.valor) {
       return DEFAULT_ALERT_CONFIG;
     }
 
     return {
       ...DEFAULT_ALERT_CONFIG,
-      ...data.value,
-      phoneNumbers: Array.isArray(data.value.phoneNumbers)
-        ? data.value.phoneNumbers
+      ...data.valor,
+      phoneNumbers: Array.isArray(data.valor.phoneNumbers)
+        ? data.valor.phoneNumbers
         : DEFAULT_ALERT_CONFIG.phoneNumbers,
     };
   } catch (err) {
@@ -116,28 +116,28 @@ export async function saveAlertsConfig(supabaseClient: SupabaseClient, config: R
   try {
     // Verificar si ya existe el registro
     const { data: existing } = await supabaseClient
-      .from('equipment_settings')
+      .from('configuracion_equipos')
       .select('id')
-      .eq('key', SETTINGS_KEY)
+      .eq('clave', SETTINGS_KEY)
       .maybeSingle();
 
     if (existing?.id) {
       const { error } = await supabaseClient
-        .from('equipment_settings')
+        .from('configuracion_equipos')
         .update({
-          value: config,
-          updated_at: new Date().toISOString()
+          valor: config,
+          actualizado_en: new Date().toISOString()
         })
         .eq('id', existing.id);
 
       if (error) throw error;
     } else {
       const { error } = await supabaseClient
-        .from('equipment_settings')
+        .from('configuracion_equipos')
         .insert([{
-          key: SETTINGS_KEY,
-          value: config,
-          updated_at: new Date().toISOString()
+          clave: SETTINGS_KEY,
+          valor: config,
+          actualizado_en: new Date().toISOString()
         }]);
 
       if (error) throw error;

@@ -37,12 +37,12 @@ export default function StockSettingsModal({ isOpen, onClose, onSuccess }: Stock
             if (!supabase) throw new Error("Supabase no configurado");
 
             const { error } = await supabase
-                .from('equipment_settings')
+                .from('configuracion_equipos')
                 .upsert({
-                    key: 'inventory',
-                    value: { z6: stock.z6, z60: stock.z60, m7: stock.m7, mx3: stock.mx3 },
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'key' });
+                    clave: 'inventory',
+                    valor: { z6: stock.z6, z60: stock.z60, m7: stock.m7, mx3: stock.mx3 },
+                    actualizado_en: new Date().toISOString()
+                }, { onConflict: 'clave' });
 
             if (error) throw error;
             onSuccess();
